@@ -24,3 +24,21 @@ def apply_scenario(id):
         flash("找不到該劇本", "error")
         
     return redirect(url_for('scenario.index'))
+
+@scenario_bp.route('/new', methods=['GET', 'POST'])
+def new_scenario():
+    if request.method == 'POST':
+        title = request.form.get('title')
+        caller_name = request.form.get('caller_name')
+        phone_number = request.form.get('phone_number')
+        description = request.form.get('description')
+        
+        if not title or not caller_name or not phone_number:
+            flash('劇本名稱、來電者名稱與電話號碼為必填', 'error')
+            return render_template('scenario/new.html', title=title, caller_name=caller_name, phone_number=phone_number, description=description)
+            
+        Scenario.create(title, caller_name, phone_number, description)
+        flash('成功新增自定義劇本！', 'success')
+        return redirect(url_for('scenario.index'))
+        
+    return render_template('scenario/new.html')

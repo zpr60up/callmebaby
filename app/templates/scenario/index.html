@@ -1,9 +1,13 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2 class="page-title">選擇脫逃劇本</h2>
-<p class="page-subtitle">選擇一個最適合當下情境的藉口，我們將為您準備好來電與語音。</p>
-
+<div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem;">
+    <div>
+        <h2 class="page-title" style="margin-bottom: 0.5rem;">選擇脫逃劇本</h2>
+        <p class="page-subtitle" style="margin-bottom: 0;">選擇一個最適合當下情境的藉口，我們將為您準備好來電與語音。</p>
+    </div>
+    <a href="{{ url_for('scenario.new_scenario') }}" class="btn btn-primary" style="width: auto;">+ 新增劇本</a>
+</div>
 <div class="scenario-grid">
     {% for scenario in scenarios %}
     <div class="scenario-card {% if active_scenario_id == scenario.id %}active{% endif %}">
@@ -13,10 +17,10 @@
             <span class="active-badge">使用中</span>
             {% endif %}
         </div>
-        
+
         <div class="card-body">
             <p class="card-desc">{{ scenario.description }}</p>
-            
+
             <div class="info-row">
                 <span class="info-label">來電者</span>
                 <span class="info-value">{{ scenario.caller_name }}</span>
@@ -27,11 +31,12 @@
             </div>
         </div>
 
-        <form action="{{ url_for('scenario.apply_scenario', id=scenario.id) }}" method="POST" style="margin-top: 1.5rem;">
+        <form action="{{ url_for('scenario.apply_scenario', id=scenario.id) }}" method="POST"
+            style="margin-top: 1.5rem;">
             {% if active_scenario_id == scenario.id %}
-                <button type="button" class="btn btn-outline" disabled>已套用此劇本</button>
+            <button type="button" class="btn btn-outline" disabled>已套用此劇本</button>
             {% else %}
-                <button type="submit" class="btn btn-primary">套用此劇本</button>
+            <button type="submit" class="btn btn-primary">套用此劇本</button>
             {% endif %}
         </form>
     </div>
