@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>通話中...</title>
+    <!-- 根據設定載入對應的 CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/' + os_style + '.css') }}">
+</head>
+<body class="{{ os_style }}-style">
+    <div class="call-screen">
+        <div class="caller-info">
+            <h1 class="caller-name">{{ scenario.caller_name }}</h1>
+            <p class="call-status" id="timer">00:00</p>
+        </div>
+
+        <div class="keypad-grid">
+            <div class="grid-btn">
+                <div class="icon-circle">🎙️</div>
+                <span class="label">靜音</span>
+            </div>
+            <div class="grid-btn">
+                <div class="icon-circle">🔢</div>
+                <span class="label">鍵盤</span>
+            </div>
+            <div class="grid-btn">
+                <div class="icon-circle">🔊</div>
+                <span class="label">擴音</span>
+            </div>
+            <div class="grid-btn">
+                <div class="icon-circle">➕</div>
+                <span class="label">新增通話</span>
+            </div>
+            <div class="grid-btn">
+                <div class="icon-circle">💬</div>
+                <span class="label">FaceTime</span>
+            </div>
+            <div class="grid-btn">
+                <div class="icon-circle">👤</div>
+                <span class="label">聯絡人</span>
+            </div>
+        </div>
+
+        <div class="active-actions">
+            <div class="action-btn-wrapper">
+                <a href="{{ url_for('main.index') }}" class="action-btn btn-end" style="text-decoration:none;">
+                    <span style="transform: rotate(135deg);">📞</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 隱藏的語音播放器 -->
+    <audio id="scenario-audio" src="{{ url_for('static', filename='audio/' + scenario.audio_file) }}" autoplay></audio>
+
+    <script src="{{ url_for('static', filename='js/call.js') }}"></script>
+</body>
+</html>

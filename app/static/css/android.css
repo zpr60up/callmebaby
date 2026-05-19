@@ -1,0 +1,131 @@
+/* Android Style Call Screen */
+body.android-style {
+    background: #000;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    color: white;
+    font-family: Roboto, "Segoe UI", sans-serif;
+    overflow: hidden;
+}
+
+.android-style .call-screen {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 60px 20px 40px;
+    background: #111111;
+}
+
+.android-style .caller-info {
+    text-align: center;
+    margin-top: 60px;
+}
+
+.android-style .caller-name {
+    font-size: 32px;
+    font-weight: 500;
+    margin-bottom: 8px;
+    letter-spacing: 0.2px;
+}
+
+.android-style .call-status {
+    font-size: 16px;
+    color: #a0a0a0;
+}
+
+/* Incoming Call Actions */
+.android-style .actions-container {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 50px;
+    margin-bottom: 60px;
+    align-items: flex-end;
+}
+
+.android-style .action-btn-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.android-style .action-btn {
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 28px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.android-style .btn-decline {
+    background-color: #f28b82;
+    color: #202124;
+}
+
+.android-style .btn-accept {
+    background-color: #81c995;
+    color: #202124;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(129, 201, 149, 0.7); }
+    70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(129, 201, 149, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(129, 201, 149, 0); }
+}
+
+.android-style .btn-end {
+    background-color: #ee675c;
+    color: white;
+    width: 72px;
+    height: 72px;
+    animation: none;
+}
+
+.android-style .active-actions {
+    display: flex;
+    justify-content: center;
+    padding: 0 40px;
+    margin-bottom: 50px;
+}
+
+.android-style .action-label {
+    font-size: 14px;
+    color: #e8eaed;
+}
+
+/* Grid */
+.android-style .keypad-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    padding: 0 40px;
+    margin-bottom: 50px;
+}
+
+.android-style .grid-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.android-style .grid-btn .icon-circle {
+    font-size: 28px;
+    color: #e8eaed;
+}
+
+.android-style .grid-btn .label {
+    font-size: 14px;
+    color: #9aa0a6;
+}

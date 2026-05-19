@@ -1,6 +1,9 @@
 # 資料庫設計 (DB Design)
 
-## 1. ER 圖（實體關係圖）
+## 1. ER 圖 (實體關係圖)
+
+專案目前不具備帳號登入系統，所有資料將儲存於 SQLite 中作為全域的情境範本供選用。我們設計一個 `scenarios` (情境劇本) 資料表。
+
 ```mermaid
 erDiagram
   SCENARIOS {
@@ -10,31 +13,35 @@ erDiagram
     string phone_number
     string voice_path
     string description
+    string name
+    string caller_name
+    string caller_number
+    string audio_file
+    boolean is_custom
     datetime created_at
   }
 ```
 
 ## 2. 資料表詳細說明
-### SCENARIOS
-儲存系統預設或使用者自訂的脫逃劇本。
-- `id` (INTEGER): 主鍵
-- `title` (TEXT): 劇本名稱（例：家庭急事、公司加班）
-- `caller_name` (TEXT): 模擬的來電名稱（例：媽媽、老闆）
-- `phone_number` (TEXT): 模擬的來電號碼
-- `voice_path` (TEXT): 對應的預錄語音路徑
-- `description` (TEXT): 情境說明
-- `created_at` (DATETIME): 建立時間
+
+### `scenarios` 資料表
+
+用來儲存假來電的情境劇本。
+
+| 欄位名稱 | 型別 | 必填 | 說明 |
+| :--- | :--- | :--- | :--- |
+| `id` | INTEGER | 是 | Primary Key, 自動遞增 |
+| `name` | TEXT | 是 | 情境名稱 (例如：「媽媽催回家」) |
+| `caller_name` | TEXT | 是 | 顯示的來電者名稱 (例如：「媽媽」) |
+| `caller_number` | TEXT | 否 | 顯示的來電號碼 (例如：「0912-345-678」) |
+| `audio_file` | TEXT | 否 | 對應的語音檔案路徑 (例如：「mom_call.mp3」) |
+| `is_custom` | BOOLEAN | 是 | 是否為使用者自定義 (1: 是, 0: 預設內建) |
+| `created_at` | DATETIME | 是 | 建立時間 |
 
 ## 3. SQL 建表語法
-存放於 `database/schema.sql`。
-```sql
-CREATE TABLE IF NOT EXISTS scenarios (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    title TEXT NOT NULL,
-    caller_name TEXT NOT NULL,
-    phone_number TEXT NOT NULL,
-    voice_path TEXT,
-    description TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-```
+
+請參考 `database/schema.sql` 檔案。
+
+## 4. Python Model 程式碼
+
+請參考 `app/models/scenario.py` 檔案。

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>來電中...</title>
+    <!-- 根據設定載入對應的 CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/' + os_style + '.css') }}">
+</head>
+<body class="{{ os_style }}-style">
+    <div class="call-screen">
+        <div class="caller-info">
+            <h1 class="caller-name">{{ scenario.caller_name }}</h1>
+            <p class="call-status">
+                {% if os_style == 'ios' %}
+                    行動電話
+                {% else %}
+                    來電...
+                {% endif %}
+            </p>
+        </div>
+
+        <div class="actions-container">
+            <div class="action-btn-wrapper">
+                <a href="{{ url_for('main.index') }}" class="action-btn btn-decline" style="text-decoration:none;">
+                    {% if os_style == 'ios' %}
+                        <span style="transform: rotate(135deg);">📞</span>
+                    {% else %}
+                        <span style="transform: rotate(135deg);">📞</span>
+                    {% endif %}
+                </a>
+                <span class="action-label">拒絕</span>
+            </div>
+
+            <div class="action-btn-wrapper">
+                <a href="{{ url_for('call.active', os_style=os_style, scenario_id=scenario.id) }}" class="action-btn btn-accept" style="text-decoration:none;">
+                    📞
+                </a>
+                <span class="action-label">接聽</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
