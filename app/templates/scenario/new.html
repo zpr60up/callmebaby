@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto;">
+    <div style="display: flex; align-items: center; margin-bottom: 2rem;">
+        <a href="{{ url_for('scenario.index') }}" class="btn btn-outline" style="width: auto; padding: 0.5rem 1rem; margin-right: 1rem;">&larr; 返回</a>
+        <h2 class="page-title" style="margin-bottom: 0;">新增自定義劇本</h2>
+    </div>
+
+    <div class="scenario-card" style="box-shadow: 0 8px 32px 0 rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.1);">
+        <form action="{{ url_for('scenario.new_scenario') }}" method="POST">
+            <div class="form-group">
+                <label for="title" class="form-label">劇本名稱 <span style="color: #ef4444;">*</span></label>
+                <input type="text" id="title" name="title" class="form-control" value="{{ title or '' }}" placeholder="例如：假裝朋友找我" required>
+            </div>
+
+            <div class="form-group">
+                <label for="caller_name" class="form-label">來電者名稱 <span style="color: #ef4444;">*</span></label>
+                <input type="text" id="caller_name" name="caller_name" class="form-control" value="{{ caller_name or '' }}" placeholder="例如：李小明" required>
+            </div>
+
+            <div class="form-group">
+                <label for="phone_number" class="form-label">來電號碼 <span style="color: #ef4444;">*</span></label>
+                <input type="text" id="phone_number" name="phone_number" class="form-control" value="{{ phone_number or '' }}" placeholder="例如：0912345678" required>
+            </div>
+
+            <div class="form-group">
+                <label for="description" class="form-label">情境說明</label>
+                <textarea id="description" name="description" class="form-control" rows="3" placeholder="描述一下這個劇本的適用情境...">{{ description or '' }}</textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">建立劇本</button>
+        </form>
+    </div>
+</div>
+
+<style>
+.form-group {
+    margin-bottom: 1.5rem;
+}
+.form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--text-light);
+}
+.form-control {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    color: var(--text-light);
+    font-family: inherit;
+    font-size: 1rem;
+    transition: all 0.2s;
+    box-sizing: border-box;
+}
+.form-control:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+.form-control::placeholder {
+    color: #6b7280;
+}
+</style>
+{% endblock %}

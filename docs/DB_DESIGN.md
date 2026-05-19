@@ -8,6 +8,11 @@
 erDiagram
   SCENARIOS {
     int id PK
+    string title
+    string caller_name
+    string phone_number
+    string voice_path
+    string description
     string name
     string caller_name
     string caller_number

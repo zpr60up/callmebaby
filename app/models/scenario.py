@@ -1,3 +1,4 @@
+
 import sqlite3
 from datetime import datetime
 
@@ -65,3 +66,4 @@ class Scenario:
         conn.execute('DELETE FROM scenarios WHERE id = ?', (scenario_id,))
         conn.commit()
         conn.close()
+
