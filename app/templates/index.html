@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="dashboard">
+    <header class="header">
+        <h1>Call Me Baby</h1>
+        <p>完美脫逃，不再尷尬</p>
+    </header>
+
+    <div class="tabs">
+        <button class="tab-btn active" data-target="templates-tab">情境劇本</button>
+        <button class="tab-btn" data-target="custom-tab">自訂來電</button>
+    </div>
+
+    <div class="tab-content active" id="templates-tab">
+        <div class="scenario-list">
+            {% for s in scenarios %}
+            <div class="scenario-card" onclick="selectScenario('{{ s.caller_name }}', '{{ s.caller_phone }}', '{{ s.avatar_path }}')">
+                <div class="scenario-icon">
+                    {% if s.category == 'emergency' %}
+                    <i class="fa-solid fa-house-chimney-crack"></i>
+                    {% elif s.category == 'work' %}
+                    <i class="fa-solid fa-briefcase"></i>
+                    {% elif s.category == 'delivery' %}
+                    <i class="fa-solid fa-box"></i>
+                    {% else %}
+                    <i class="fa-solid fa-phone"></i>
+                    {% endif %}
+                </div>
+                <div class="scenario-info">
+                    <h3>{{ s.title }}</h3>
+                    <p>{{ s.caller_name }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="tab-content" id="custom-tab">
+        <form id="custom-form" class="custom-form">
+            <div class="form-group">
+                <label for="custom_name">來電名稱</label>
+                <input type="text" id="custom_name" placeholder="例如：老闆、媽媽" required>
+            </div>
+            <div class="form-group">
+                <label for="custom_phone">電話號碼 (選填)</label>
+                <input type="text" id="custom_phone" placeholder="例如：0912-345-678">
+            </div>
+            <div class="form-group">
+                <label>儲存的來電者</label>
+                <div class="saved-callers">
+                    {% for c in custom_callers %}
+                    <div class="caller-chip" onclick="fillCustom('{{ c.caller_name }}', '{{ c.caller_phone }}')">
+                        {{ c.caller_name }}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <button type="submit" class="btn btn-secondary">儲存此來電者</button>
+        </form>
+    </div>
+
+    <div class="trigger-section glass-panel">
+        <h3>觸發設定</h3>
+        <div class="selected-info" id="selected-info">
+            <div class="selected-avatar">
+                <i class="fa-solid fa-user"></i>
+            </div>
+            <div class="selected-details">
+                <h4 id="display-name">尚未選擇</h4>
+                <p id="display-phone">請選擇劇本或自訂</p>
+            </div>
+        </div>
+
+        <div class="timer-control">
+            <label>延遲時間：<span id="timer-val">即時</span></label>
+            <input type="range" id="delay-slider" min="0" max="300" step="10" value="0">
+            <div class="timer-labels">
+                <span>0s</span>
+                <span>5m</span>
+            </div>
+        </div>
+
+        <button class="btn btn-primary btn-large" id="trigger-btn" disabled>
+            <i class="fa-solid fa-bolt"></i> 準備脫逃
+        </button>
+    </div>
+
+    <div id="countdown-overlay" class="countdown-overlay hidden">
+        <div class="countdown-content">
+            <h2>假來電準備中...</h2>
+            <div class="spinner"></div>
+            <p>請將手機放置於桌面或口袋</p>
+            <button class="btn btn-danger" id="cancel-btn">取消</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
