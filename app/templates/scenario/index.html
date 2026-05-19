@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2 class="page-title">選擇脫逃劇本</h2>
+<p class="page-subtitle">選擇一個最適合當下情境的藉口，我們將為您準備好來電與語音。</p>
+
+<div class="scenario-grid">
+    {% for scenario in scenarios %}
+    <div class="scenario-card {% if active_scenario_id == scenario.id %}active{% endif %}">
+        <div class="card-header">
+            <h3 class="card-title">{{ scenario.title }}</h3>
+            {% if active_scenario_id == scenario.id %}
+            <span class="active-badge">使用中</span>
+            {% endif %}
+        </div>
+        
+        <div class="card-body">
+            <p class="card-desc">{{ scenario.description }}</p>
+            
+            <div class="info-row">
+                <span class="info-label">來電者</span>
+                <span class="info-value">{{ scenario.caller_name }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">電話</span>
+                <span class="info-value">{{ scenario.phone_number }}</span>
+            </div>
+        </div>
+
+        <form action="{{ url_for('scenario.apply_scenario', id=scenario.id) }}" method="POST" style="margin-top: 1.5rem;">
+            {% if active_scenario_id == scenario.id %}
+                <button type="button" class="btn btn-outline" disabled>已套用此劇本</button>
+            {% else %}
+                <button type="submit" class="btn btn-primary">套用此劇本</button>
+            {% endif %}
+        </form>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
