@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Call Me Baby - 情境脫逃模擬器">
+    <title>{% block title %}Call Me Baby{% endblock %}</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+
+    <!-- Base CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-container" id="flash-container">
+            {% for category, message in messages %}
+            <div class="flash-msg flash-{{ category }}">
+                <span class="material-icons-round">
+                    {% if category == 'success' %}check_circle{% elif category == 'error' %}error{% else %}info{% endif %}
+                </span>
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    {% endwith %}
+
+    {% block body %}{% endblock %}
+
+    {% block extra_js %}{% endblock %}
+
+    <script>
+        // 自動隱藏 flash messages
+        setTimeout(() => {
+            const fc = document.getElementById('flash-container');
+            if (fc) fc.style.opacity = '0';
+            setTimeout(() => { if (fc) fc.remove(); }, 500);
+        }, 3000);
+    </script>
+</body>
+</html>
