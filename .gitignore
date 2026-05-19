@@ -3,3 +3,10 @@ __pycache__/
 instance/
 *.pyc
 *.db
+instance/
+*.pyc
+.env
+__pycache__/
+*.db
+venv/
+env/
