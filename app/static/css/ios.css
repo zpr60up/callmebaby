@@ -1,0 +1,132 @@
+/* iOS Style Call Screen */
+body.ios-style {
+    background: #000;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    color: white;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    overflow: hidden;
+}
+
+.ios-style .call-screen {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 50px 20px 40px;
+    background: linear-gradient(180deg, #1c1c1e 0%, #000000 100%);
+}
+
+.ios-style .caller-info {
+    text-align: center;
+    margin-top: 40px;
+}
+
+.ios-style .caller-name {
+    font-size: 34px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.ios-style .call-status {
+    font-size: 16px;
+    color: #ebebf5;
+    opacity: 0.6;
+}
+
+.ios-style .actions-container {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 40px;
+    margin-bottom: 40px;
+}
+
+.ios-style .action-btn-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.ios-style .action-btn {
+    width: 75px;
+    height: 75px;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 32px;
+    cursor: pointer;
+    transition: transform 0.1s, filter 0.1s;
+}
+
+.ios-style .action-btn:active {
+    filter: brightness(0.8);
+    transform: scale(0.95);
+}
+
+.ios-style .btn-decline {
+    background-color: #ff3b30;
+    color: white;
+}
+
+.ios-style .btn-accept {
+    background-color: #34c759;
+    color: white;
+}
+
+.ios-style .btn-end {
+    background-color: #ff3b30;
+    color: white;
+}
+
+.ios-style .action-label {
+    font-size: 14px;
+    color: #fff;
+    opacity: 0.9;
+}
+
+/* For Active call layout */
+.ios-style .active-actions {
+    display: flex;
+    justify-content: center;
+    padding: 0 40px;
+    margin-bottom: 40px;
+}
+
+.ios-style .keypad-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    padding: 0 30px;
+    margin-bottom: 40px;
+}
+
+.ios-style .grid-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.ios-style .grid-btn .icon-circle {
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    background-color: rgba(255,255,255,0.15);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+}
+
+.ios-style .grid-btn .label {
+    font-size: 13px;
+    color: #fff;
+}

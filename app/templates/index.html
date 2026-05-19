@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="app-container">
+    <header class="app-header">
+        <h1>Call Me Baby</h1>
+        <p>情境脫逃生產器</p>
+    </header>
+
+    <main class="app-main">
+        <form action="{{ url_for('call.trigger') }}" method="POST" class="settings-form">
+            
+            <section class="settings-group">
+                <h2>1. 選擇介面風格</h2>
+                <div class="radio-group">
+                    <label class="radio-card">
+                        <input type="radio" name="os_style" value="ios" checked>
+                        <span class="card-content">
+                            <span class="icon">🍎</span>
+                            <span class="text">iOS 風格</span>
+                        </span>
+                    </label>
+                    <label class="radio-card">
+                        <input type="radio" name="os_style" value="android">
+                        <span class="card-content">
+                            <span class="icon">🤖</span>
+                            <span class="text">Android 風格</span>
+                        </span>
+                    </label>
+                </div>
+            </section>
+
+            <section class="settings-group">
+                <h2>2. 選擇語音情境</h2>
+                <div class="select-wrapper">
+                    <select name="scenario_id" required>
+                        {% for scenario in scenarios %}
+                        <option value="{{ scenario.id }}">{{ scenario.name }} (來電者: {{ scenario.caller_name }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </section>
+
+            <button type="submit" class="btn-primary trigger-btn">
+                <span>立即觸發假來電</span>
+                <span class="btn-icon">📞</span>
+            </button>
+        </form>
+    </main>
+</div>
+{% endblock %}
