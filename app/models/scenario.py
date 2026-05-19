@@ -1,8 +1,7 @@
-
 import sqlite3
-from datetime import datetime
+import os
 
-DB_PATH = 'database/callmebaby.db'
+DB_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'instance', 'database.db')
 
 def get_db_connection():
     conn = sqlite3.connect(DB_PATH)
