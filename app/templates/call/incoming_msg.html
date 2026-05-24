@@ -1,0 +1,584 @@
+{% extends "base.html" %}
+{% block title %}訊息通知 — {{ caller['name'] }}{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ═══════════════════════════════════════════
+   擬真鎖定畫面 & 訊息通知 CSS (iOS / Android)
+   ═══════════════════════════════════════════ */
+
+:root {
+    --ios-font: -apple-system, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+    --android-font: 'Roboto', 'Noto Sans TC', sans-serif;
+}
+
+body {
+    background-color: #000;
+    color: #fff;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    overflow: hidden;
+    user-select: none;
+}
+
+.lock-screen {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 60px 24px 40px;
+    box-sizing: border-box;
+    z-index: 999;
+    cursor: pointer;
+}
+
+/* ─── 桌布背景 (iOS / Android) ─── */
+.wallpaper-bg {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 30% 20%, #2b1f4d 0%, #110e20 40%, #06050b 100%);
+    background-size: cover;
+    z-index: -1;
+    filter: brightness(0.85);
+}
+
+.wallpaper-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.1);
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* ─── iOS 樣式 ─── */
+.ios-style {
+    font-family: var(--ios-font);
+}
+
+.ios-style .status-bar {
+    position: absolute;
+    top: 14px;
+    width: calc(100% - 56px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 600;
+    z-index: 10;
+    padding: 0 28px;
+    opacity: 0.9;
+}
+
+.ios-style .notch {
+    width: 120px;
+    height: 30px;
+    background: #000;
+    border-radius: 0 0 18px 18px;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 11;
+}
+
+.ios-style .status-icons {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.ios-style .lock-clock-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 30px;
+    z-index: 5;
+}
+
+.ios-style .lock-date {
+    font-size: 19px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    color: rgba(255, 255, 255, 0.95);
+    margin-bottom: 2px;
+}
+
+.ios-style .lock-time {
+    font-size: 80px;
+    font-weight: 200;
+    letter-spacing: -1px;
+    margin: 0;
+    color: #fff;
+    line-height: 1;
+}
+
+/* iOS 訊息推播 Banner */
+.ios-style .notification-banner {
+    position: fixed;
+    top: 60px;
+    left: 16px;
+    right: 16px;
+    background: rgba(25, 25, 27, 0.65);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border: 1.5px solid rgba(255, 255, 255, 0.12);
+    border-radius: 20px;
+    padding: 14px 16px;
+    display: flex;
+    gap: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    z-index: 1000;
+    transform: translateY(-200px);
+    opacity: 0;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s ease;
+    max-width: 440px;
+    margin: 0 auto;
+}
+
+.ios-style .notification-banner.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.ios-style .app-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    overflow: hidden;
+    position: relative;
+    flex-shrink: 0;
+    background: #3a3a3c;
+}
+
+.ios-style .app-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.ios-style .app-badge-icon {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 18px;
+    height: 18px;
+    background: #06c755; /* LINE green */
+    border-radius: 50%;
+    border: 1.5px solid rgba(25, 25, 27, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ios-style .app-badge-icon svg {
+    width: 10px;
+    height: 10px;
+    fill: #fff;
+}
+
+.ios-style .notification-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.ios-style .notification-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2px;
+}
+
+.ios-style .app-title {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+}
+
+.ios-style .notification-time {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.ios-style .sender-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 2px;
+}
+
+.ios-style .message-body {
+    font-size: 14px;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.35;
+    word-break: break-all;
+}
+
+/* ─── Android 樣式 ─── */
+.android-style {
+    font-family: var(--android-font);
+}
+
+.android-style .status-bar {
+    position: absolute;
+    top: 10px;
+    width: calc(100% - 40px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    z-index: 10;
+    padding: 0 20px;
+    opacity: 0.85;
+}
+
+.android-style .status-icons {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.android-style .lock-clock-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 50px;
+    z-index: 5;
+}
+
+.android-style .lock-time {
+    font-size: 76px;
+    font-weight: 300;
+    color: #e3e2e6;
+    margin: 0;
+    line-height: 1;
+}
+
+.android-style .lock-date {
+    font-size: 16px;
+    color: #e3e2e6;
+    margin-top: 8px;
+    font-weight: 400;
+}
+
+/* Android 訊息推播 Banner */
+.android-style .notification-banner {
+    position: fixed;
+    top: 50px;
+    left: 12px;
+    right: 12px;
+    background: #1c1b1f; /* Material You Dark */
+    border-radius: 28px;
+    padding: 16px;
+    display: flex;
+    gap: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    transform: translateY(-200px);
+    opacity: 0;
+    transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.5s ease;
+    max-width: 440px;
+    margin: 0 auto;
+}
+
+.android-style .notification-banner.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.android-style .app-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    overflow: hidden;
+    position: relative;
+    flex-shrink: 0;
+    background: #49454f;
+}
+
+.android-style .app-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.android-style .app-badge-icon {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 18px;
+    height: 18px;
+    background: #25d366; /* WhatsApp Green */
+    border-radius: 50%;
+    border: 2px solid #1c1b1f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.android-style .app-badge-icon svg {
+    width: 10px;
+    height: 10px;
+    fill: #fff;
+}
+
+.android-style .notification-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    justify-content: center;
+}
+
+.android-style .notification-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 2px;
+}
+
+.android-style .app-title {
+    font-size: 12px;
+    font-weight: 500;
+    color: #c9c5d0;
+}
+
+.android-style .app-dot {
+    width: 3px;
+    height: 3px;
+    background: #c9c5d0;
+    border-radius: 50%;
+}
+
+.android-style .notification-time {
+    font-size: 12px;
+    color: #c9c5d0;
+}
+
+.android-style .sender-name {
+    font-size: 15px;
+    font-weight: bold;
+    color: #e6e1e5;
+    margin-bottom: 1px;
+}
+
+.android-style .message-body {
+    font-size: 14px;
+    color: #cac4d0;
+    line-height: 1.3;
+    word-break: break-all;
+}
+
+/* ─── 提示滑動與退出的輔助文字 ─── */
+.bottom-hint {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    color: rgba(255, 255, 255, 0.4);
+    z-index: 10;
+    pointer-events: none;
+}
+
+.ios-style .bottom-hint {
+    font-size: 13px;
+    letter-spacing: 0.5px;
+}
+
+.android-style .bottom-hint {
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.ios-home-indicator {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 134px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 3px;
+    z-index: 10;
+}
+
+/* ─── 點擊回饋動畫 ─── */
+.click-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0);
+    transition: background 0.1s ease;
+    z-index: 1;
+}
+.click-overlay:active {
+    background: rgba(255,255,255,0.05);
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="lock-screen {% if caller['call_style'] == 'android' %}android-style{% else %}ios-style{% endif %}" id="lock-screen-wrapper">
+    <div class="wallpaper-bg"></div>
+    <div class="wallpaper-overlay"></div>
+    <div class="click-overlay" onclick="exitLockScreen()"></div>
+
+    <!-- 頂部 notch (僅 iOS) -->
+    {% if caller['call_style'] != 'android' %}
+    <div class="notch"></div>
+    {% endif %}
+
+    <!-- 狀態列 -->
+    <div class="status-bar">
+        <div class="status-time" id="status-time">09:41</div>
+        <div class="status-icons">
+            {% if caller['call_style'] == 'android' %}
+            <!-- Android Style Icons -->
+            <span class="material-icons-round" style="font-size: 16px;">network_wifi</span>
+            <span class="material-icons-round" style="font-size: 16px;">signal_cellular_alt</span>
+            <span class="material-icons-round" style="font-size: 16px;">battery_full</span>
+            {% else %}
+            <!-- iOS Style Icons -->
+            <svg width="17" height="12" viewBox="0 0 17 12" fill="white"><rect x="0" y="8" width="3" height="4" rx="0.5"/><rect x="4.5" y="5" width="3" height="7" rx="0.5"/><rect x="9" y="2" width="3" height="10" rx="0.5"/><rect x="13.5" y="0" width="3" height="12" rx="0.5"/></svg>
+            <svg width="16" height="12" viewBox="0 0 16 12" fill="white"><path d="M8 10.5a1.5 1.5 0 110 3 1.5 1.5 0 010-3z"/><path d="M4.93 8.47a4.5 4.5 0 016.14 0" stroke="white" stroke-width="1.2" fill="none" stroke-linecap="round"/><path d="M2.1 5.64a8 8 0 0111.8 0" stroke="white" stroke-width="1.2" fill="none" stroke-linecap="round"/><path d="M.34 3.34A11 11 0 0115.66 3.34" stroke="white" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg>
+            <svg width="27" height="13" viewBox="0 0 27 13" fill="none"><rect x="0.5" y="0.5" width="23" height="12" rx="2.5" stroke="white" stroke-opacity="0.5"/><rect x="2" y="2" width="18" height="9" rx="1.5" fill="white"/><path d="M25 4.5v4a2 2 0 000-4z" fill="white" fill-opacity="0.5"/></svg>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- 鎖定畫面時鐘與日期 -->
+    <div class="lock-clock-section">
+        {% if caller['call_style'] == 'android' %}
+        <!-- Android 垂直/雙排時鐘 -->
+        <h1 class="lock-time" id="lock-time">09:41</h1>
+        <div class="lock-date" id="lock-date">5月25日 週一</div>
+        {% else %}
+        <!-- iOS 鎖定畫面時鐘 -->
+        <div class="lock-date" id="lock-date">5月25日 星期一</div>
+        <h1 class="lock-time" id="lock-time">09:41</h1>
+        {% endif %}
+    </div>
+
+    <!-- 訊息推播 Banner -->
+    <div class="notification-banner" id="msg-banner" onclick="exitLockScreen(event)">
+        <div class="app-avatar">
+            <img src="{{ url_for('static', filename='images/' + caller['avatar']) }}" 
+                 alt="{{ caller['name'] }}" 
+                 onerror="this.src='{{ url_for('static', filename='images/avatar_default.png') }}'">
+            <div class="app-badge-icon">
+                {% if caller['call_style'] == 'android' %}
+                <!-- WhatsApp 綠標 icon -->
+                <svg viewBox="0 0 24 24"><path d="M12.004 2c-5.518 0-9.998 4.48-9.998 9.998 0 1.996.586 3.86 1.6 5.439l-1.606 4.883 5.022-1.562a9.92 9.92 0 004.982 1.242c5.518 0 9.998-4.48 9.998-9.998 0-5.518-4.48-9.998-9.998-9.998zm4.492 14.195c-.218.614-1.284 1.182-1.77 1.233-.457.047-.946.066-1.576-.14-2.61-.853-4.414-3.486-4.542-3.659-.13-.172-1.04-1.383-1.04-2.637 0-1.254.653-1.871.884-2.112.23-.242.505-.302.673-.302.17 0 .34.002.488.01.155.008.363-.06.568.444.208.512.71 1.734.772 1.862.062.128.104.278.018.45-.084.17-.126.277-.252.424-.126.146-.264.327-.378.439-.126.124-.258.26-.112.512.146.252.648 1.07 1.39 1.733.957.854 1.76 1.118 2.012 1.244.252.126.4-.002.548-.172.146-.172.63-.732.798-.982.168-.25.337-.208.568-.124.23.084 1.458.687 1.71 1.81.084.17.084.34.084.453 0 .114 0 .512-.218 1.127z"/></svg>
+                {% else %}
+                <!-- LINE 綠標 icon -->
+                <svg viewBox="0 0 24 24"><path d="M22 10.3c0-4.6-4.5-8.3-10-8.3S2 5.7 2 10.3c0 4.1 3.6 7.6 8.5 8.2.3.1.8.2 1 .5l.1.8c.1.5.1 1.2-.1 1.7-.1.4-.4 1-.4 1s1.3-.8 2.1-1.7c.6-.7.9-1.3 1.1-1.6 4.8-1 8.1-4.4 8.1-8.9zm-13.6.8H7c-.2 0-.4-.2-.4-.4V8c0-.2.2-.4.4-.4s.4.2.4.4v2.3h1c.2 0 .4.2.4.4s-.2.4-.4.4zm2.6-.4c0 .2-.2.4-.4.4s-.4-.2-.4-.4V8c0-.2.2-.4.4-.4s.4.2.4.4v2.7zm3.8 0c0 .2-.2.4-.4.4H13c-.2 0-.4-.2-.4-.4V8.1c0-.2.2-.4.4-.4h1.4c.2 0 .4.2.4.4v2.2zm1.6 0H15v-.9h1.4c.2 0 .4-.2.4-.4V9c0-.2-.2-.4-.4-.4H15v-.9h1.4c.2 0 .4-.2.4-.4v-.3c0-.2-.2-.4-.4-.4h-2.2c-.2 0-.4.2-.4.4v3.5c0 .2.2.4.4.4h2.2c.2 0 .4-.2.4-.4V11c-.1-.2-.3-.3-.5-.3z"/></svg>
+                {% endif %}
+            </div>
+        </div>
+        <div class="notification-content">
+            <div class="notification-header">
+                <span class="app-title">{% if caller['call_style'] == 'android' %}Messages{% else %}LINE{% endif %}</span>
+                {% if caller['call_style'] == 'android' %}
+                <span class="app-dot"></span>
+                {% endif %}
+                <span class="notification-time">現在</span>
+            </div>
+            <div class="sender-name">{{ caller['name'] }}</div>
+            <div class="message-body">{{ message }}</div>
+        </div>
+    </div>
+
+    <!-- 底部滑動/輔助文字 -->
+    <div class="bottom-hint">
+        {% if caller['call_style'] == 'android' %}
+        向任意方向滑動以解鎖
+        {% else %}
+        向上滑動以解鎖
+        {% endif %}
+    </div>
+
+    {% if caller['call_style'] != 'android' %}
+    <div class="ios-home-indicator"></div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/call-audio.js') }}"></script>
+<script>
+    const callerStyle = "{{ caller['call_style'] }}";
+    const setupUrl = "{{ url_for('call.setup') }}";
+
+    function updateTime() {
+        const now = new Date();
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        document.getElementById('status-time').textContent = `${hours}:${minutes}`;
+        
+        // 鎖定畫面時鐘
+        const lockTimeEl = document.getElementById('lock-time');
+        if (lockTimeEl) lockTimeEl.textContent = `${hours}:${minutes}`;
+
+        // 日期更新
+        const months = now.getMonth() + 1;
+        const date = now.getDate();
+        
+        const days = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+        const daysShort = ['週日', '週一', '週二', '週三', '週四', '週五', '週六'];
+        
+        const dayName = days[now.getDay()];
+        const dayShortName = daysShort[now.getDay()];
+        
+        const lockDateEl = document.getElementById('lock-date');
+        if (lockDateEl) {
+            if (callerStyle === 'android') {
+                lockDateEl.textContent = `${months}月${date}日 ${dayShortName}`;
+            } else {
+                lockDateEl.textContent = `${months}月${date}日 ${dayName}`;
+            }
+        }
+    }
+
+    function exitLockScreen(event) {
+        // 防止重複觸發
+        if (event) {
+            event.stopPropagation();
+        }
+        
+        // 停止震動並退回設定頁
+        audioManager.stopVibrate();
+        window.location.href = setupUrl;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // 1. 初始化時間
+        updateTime();
+        setInterval(updateTime, 1000);
+
+        // 2. 延遲 1.5 秒後播放音效、震動並秀出推播 Banner
+        setTimeout(() => {
+            // 播放通知提示音 (iOS / Android 自適應)
+            audioManager.playNotificationSound(callerStyle);
+            
+            // 觸發震動
+            audioManager.vibrateOnce();
+
+            // 彈出橫幅
+            const banner = document.getElementById('msg-banner');
+            if (banner) {
+                banner.classList.add('show');
+            }
+        }, 1500);
+    });
+</script>
+{% endblock %}
