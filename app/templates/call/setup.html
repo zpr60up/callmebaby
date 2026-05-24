@@ -1,0 +1,717 @@
+{% extends "base.html" %}
+{% block title %}來電設定 — Call Me Baby{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ═══════════════════════════════════════
+   Setup Page — 來電者管理
+   ═══════════════════════════════════════ */
+
+.setup-page {
+    min-height: 100vh;
+    padding: 0;
+    background: var(--bg-primary);
+    position: relative;
+    overflow: hidden;
+}
+
+/* 背景裝飾 */
+.setup-page::before {
+    content: '';
+    position: fixed;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(ellipse at 20% 20%, rgba(108, 92, 231, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(167, 139, 250, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(192, 132, 252, 0.04) 0%, transparent 50%);
+    animation: bgFloat 20s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 0;
+}
+
+@keyframes bgFloat {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    33% { transform: translate(2%, -2%) rotate(1deg); }
+    66% { transform: translate(-1%, 1%) rotate(-0.5deg); }
+}
+
+.setup-container {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 40px 20px 100px;
+    position: relative;
+    z-index: 1;
+}
+
+/* ─── Header ─── */
+.setup-header {
+    text-align: center;
+    margin-bottom: 36px;
+}
+
+.setup-header .logo-icon {
+    width: 64px;
+    height: 64px;
+    background: var(--accent-gradient);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    font-size: 32px;
+    box-shadow: var(--shadow-glow);
+    animation: logoPulse 3s ease-in-out infinite;
+}
+
+@keyframes logoPulse {
+    0%, 100% { box-shadow: 0 0 20px rgba(108, 92, 231, 0.3); }
+    50% { box-shadow: 0 0 40px rgba(108, 92, 231, 0.5); }
+}
+
+.setup-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    background: var(--accent-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 6px;
+}
+
+.setup-header p {
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+/* ─── Card ─── */
+.glass-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    backdrop-filter: blur(20px);
+    margin-bottom: 20px;
+    transition: all var(--transition-normal);
+}
+
+.glass-card:hover {
+    border-color: rgba(108, 92, 231, 0.3);
+    box-shadow: 0 0 20px rgba(108, 92, 231, 0.1);
+}
+
+.card-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-primary);
+}
+
+.card-title .material-icons-round {
+    font-size: 20px;
+    color: var(--accent-secondary);
+}
+
+/* ─── Form ─── */
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+}
+
+.form-input {
+    width: 100%;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-size: 15px;
+    font-family: var(--font-primary);
+    transition: all var(--transition-fast);
+    outline: none;
+}
+
+.form-input:focus {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.15);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.form-input::placeholder {
+    color: var(--text-muted);
+}
+
+/* Select */
+.form-select {
+    width: 100%;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-size: 15px;
+    font-family: var(--font-primary);
+    outline: none;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%238888a0' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    transition: all var(--transition-fast);
+}
+
+.form-select:focus {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.15);
+}
+
+.form-select option {
+    background: #1a1a2e;
+    color: var(--text-primary);
+}
+
+/* Avatar picker */
+.avatar-picker {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.avatar-option {
+    position: relative;
+}
+
+.avatar-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.avatar-option label {
+    display: block;
+    width: 52px;
+    height: 52px;
+    border-radius: var(--radius-full);
+    border: 2px solid var(--border-color);
+    overflow: hidden;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    position: relative;
+}
+
+.avatar-option label img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar-option input[type="radio"]:checked + label {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.3);
+    transform: scale(1.05);
+}
+
+/* Style toggle */
+.style-toggle {
+    display: flex;
+    gap: 8px;
+}
+
+.style-btn {
+    flex: 1;
+    position: relative;
+}
+
+.style-btn input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.style-btn label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 16px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    transition: all var(--transition-fast);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.style-btn label:hover {
+    border-color: var(--accent-primary);
+    color: var(--text-primary);
+}
+
+.style-btn input[type="radio"]:checked + label {
+    background: rgba(108, 92, 231, 0.15);
+    border-color: var(--accent-primary);
+    color: var(--accent-secondary);
+}
+
+/* Submit Button */
+.btn-submit {
+    width: 100%;
+    padding: 14px;
+    background: var(--accent-gradient);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 15px;
+    font-weight: 600;
+    font-family: var(--font-primary);
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    position: relative;
+    overflow: hidden;
+    margin-top: 8px;
+}
+
+.btn-submit:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-glow);
+}
+
+.btn-submit:active {
+    transform: translateY(0);
+}
+
+.btn-submit::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+}
+
+.btn-submit:hover::after {
+    opacity: 1;
+}
+
+/* ─── Caller List ─── */
+.caller-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.caller-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: all var(--transition-normal);
+    animation: cardFadeIn 0.5s ease forwards;
+    opacity: 0;
+}
+
+.caller-card:nth-child(1) { animation-delay: 0.05s; }
+.caller-card:nth-child(2) { animation-delay: 0.1s; }
+.caller-card:nth-child(3) { animation-delay: 0.15s; }
+.caller-card:nth-child(4) { animation-delay: 0.2s; }
+.caller-card:nth-child(5) { animation-delay: 0.25s; }
+
+@keyframes cardFadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.caller-card:hover {
+    border-color: rgba(108, 92, 231, 0.3);
+    background: var(--bg-card-hover);
+    transform: translateX(4px);
+}
+
+.caller-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: var(--radius-full);
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.caller-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.caller-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.caller-name {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 2px;
+    color: var(--text-primary);
+}
+
+.caller-phone {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.caller-meta {
+    display: flex;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.meta-tag {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    background: rgba(108, 92, 231, 0.15);
+    color: var(--accent-secondary);
+    font-weight: 500;
+}
+
+.caller-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.btn-call {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 8px 14px;
+    border-radius: var(--radius-md);
+    border: none;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: var(--font-primary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.btn-call-primary {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: #fff;
+}
+
+.btn-call-primary:hover {
+    transform: scale(1.03);
+    box-shadow: 0 0 15px rgba(34, 197, 94, 0.4);
+}
+
+.btn-call-primary .material-icons-round {
+    font-size: 16px;
+    animation: phoneRing 2s ease-in-out infinite;
+}
+
+@keyframes phoneRing {
+    0%, 100% { transform: rotate(0deg); }
+    10% { transform: rotate(15deg); }
+    20% { transform: rotate(-15deg); }
+    30% { transform: rotate(10deg); }
+    40% { transform: rotate(-5deg); }
+    50%, 100% { transform: rotate(0deg); }
+}
+
+.btn-call-danger {
+    background: rgba(244, 63, 94, 0.15);
+    color: var(--danger);
+    border: 1px solid rgba(244, 63, 94, 0.2);
+}
+
+.btn-call-danger:hover {
+    background: rgba(244, 63, 94, 0.25);
+}
+
+.btn-call-danger .material-icons-round {
+    font-size: 14px;
+}
+
+/* Empty state */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-muted);
+}
+
+.empty-state .material-icons-round {
+    font-size: 48px;
+    margin-bottom: 12px;
+    opacity: 0.3;
+}
+
+.empty-state p {
+    font-size: 14px;
+}
+
+/* ─── Section Title ─── */
+.section-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-primary);
+}
+
+.section-title .material-icons-round {
+    color: var(--accent-secondary);
+}
+
+/* ─── Voice Preview Chips ─── */
+.voice-chips {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.voice-chip {
+    position: relative;
+}
+
+.voice-chip input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.voice-chip label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text-secondary);
+    transition: all var(--transition-fast);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.voice-chip label:hover {
+    border-color: var(--accent-primary);
+}
+
+.voice-chip input[type="radio"]:checked + label {
+    background: rgba(108, 92, 231, 0.15);
+    border-color: var(--accent-primary);
+    color: var(--accent-secondary);
+}
+
+.voice-chip label .material-icons-round {
+    font-size: 16px;
+}
+
+/* Row layout */
+.form-row {
+    display: flex;
+    gap: 12px;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 480px) {
+    .setup-container {
+        padding: 24px 16px 80px;
+    }
+    .caller-card {
+        flex-wrap: wrap;
+    }
+    .caller-actions {
+        flex-direction: row;
+        width: 100%;
+        margin-top: 8px;
+    }
+    .btn-call {
+        flex: 1;
+    }
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="setup-page">
+    <div class="setup-container">
+
+        <!-- Header -->
+        <div class="setup-header">
+            <div class="logo-icon">📱</div>
+            <h1>Call Me Baby</h1>
+            <p>設定來電者資訊，隨時觸發擬真來電</p>
+        </div>
+
+        <!-- 新增來電者表單 -->
+        <div class="glass-card">
+            <div class="card-title">
+                <span class="material-icons-round">person_add</span>
+                新增來電者
+            </div>
+            <form action="{{ url_for('call.create_caller') }}" method="POST" id="add-caller-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="name">來電者名稱</label>
+                        <input class="form-input" type="text" id="name" name="name" placeholder="例如：爸爸" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="phone">電話號碼</label>
+                        <input class="form-input" type="text" id="phone" name="phone" placeholder="0912-345-678" required>
+                    </div>
+                </div>
+
+                <!-- 大頭貼選擇 -->
+                <div class="form-group">
+                    <label class="form-label">大頭貼</label>
+                    <div class="avatar-picker">
+                        <div class="avatar-option">
+                            <input type="radio" name="avatar" id="av_default" value="avatar_default.png" checked>
+                            <label for="av_default"><img src="{{ url_for('static', filename='images/avatar_default.png') }}" alt="預設"></label>
+                        </div>
+                        <div class="avatar-option">
+                            <input type="radio" name="avatar" id="av_dad" value="avatar_dad.png">
+                            <label for="av_dad"><img src="{{ url_for('static', filename='images/avatar_dad.png') }}" alt="爸爸"></label>
+                        </div>
+                        <div class="avatar-option">
+                            <input type="radio" name="avatar" id="av_mom" value="avatar_mom.png">
+                            <label for="av_mom"><img src="{{ url_for('static', filename='images/avatar_mom.png') }}" alt="媽媽"></label>
+                        </div>
+                        <div class="avatar-option">
+                            <input type="radio" name="avatar" id="av_boss" value="avatar_boss.png">
+                            <label for="av_boss"><img src="{{ url_for('static', filename='images/avatar_boss.png') }}" alt="老闆"></label>
+                        </div>
+                        <div class="avatar-option">
+                            <input type="radio" name="avatar" id="av_friend" value="avatar_friend.png">
+                            <label for="av_friend"><img src="{{ url_for('static', filename='images/avatar_friend.png') }}" alt="朋友"></label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 語音選擇 -->
+                <div class="form-group">
+                    <label class="form-label">預錄語音情境</label>
+                    <div class="voice-chips">
+                        <div class="voice-chip">
+                            <input type="radio" name="voice_file" id="vf_family" value="voice_family" checked>
+                            <label for="vf_family">
+                                <span class="material-icons-round">home</span>
+                                家人催回家
+                            </label>
+                        </div>
+                        <div class="voice-chip">
+                            <input type="radio" name="voice_file" id="vf_boss" value="voice_boss">
+                            <label for="vf_boss">
+                                <span class="material-icons-round">work</span>
+                                老闆加班
+                            </label>
+                        </div>
+                        <div class="voice-chip">
+                            <input type="radio" name="voice_file" id="vf_friend" value="voice_friend">
+                            <label for="vf_friend">
+                                <span class="material-icons-round">celebration</span>
+                                朋友邀約
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 來電風格 -->
+                <div class="form-group">
+                    <label class="form-label">來電風格</label>
+                    <div class="style-toggle">
+                        <div class="style-btn">
+                            <input type="radio" name="call_style" id="style_ios" value="ios" checked>
+                            <label for="style_ios">🍎 iPhone</label>
+                        </div>
+                        <div class="style-btn">
+                            <input type="radio" name="call_style" id="style_android" value="android">
+                            <label for="style_android">🤖 Android</label>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit">
+                    ＋ 新增來電者
+                </button>
+            </form>
+        </div>
+
+        <!-- 已儲存的來電者列表 -->
+        <div class="section-title">
+            <span class="material-icons-round">contacts</span>
+            已儲存的來電者
+        </div>
+
+        <div class="caller-list">
+            {% if callers %}
+                {% for c in callers %}
+                <div class="caller-card">
+                    <div class="caller-avatar">
+                        <img src="{{ url_for('static', filename='images/' + c['avatar']) }}" alt="{{ c['name'] }}" onerror="this.src='{{ url_for('static', filename='images/avatar_default.png') }}'">
+                    </div>
+                    <div class="caller-info">
+                        <div class="caller-name">{{ c['name'] }}</div>
+                        <div class="caller-phone">{{ c['phone'] }}</div>
+                        <div class="caller-meta">
+                            <span class="meta-tag">{{ '🍎 iOS' if c['call_style'] == 'ios' else '🤖 Android' }}</span>
+                        </div>
+                    </div>
+                    <div class="caller-actions">
+                        <a href="{{ url_for('call.incoming', caller_id=c['id']) }}" class="btn-call btn-call-primary" id="trigger-call-{{ c['id'] }}">
+                            <span class="material-icons-round">call</span>
+                            來電
+                        </a>
+                        <form action="{{ url_for('call.delete_caller', caller_id=c['id']) }}" method="POST" style="margin:0" onsubmit="return confirm('確定要刪除「{{ c['name'] }}」嗎？')">
+                            <button type="submit" class="btn-call btn-call-danger" style="width:100%">
+                                <span class="material-icons-round">delete</span>
+                                刪除
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <span class="material-icons-round">phone_disabled</span>
+                    <p>尚未設定任何來電者<br>使用上方表單新增一位吧！</p>
+                </div>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+{% endblock %}
