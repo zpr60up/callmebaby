@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="call-screen">
+    <!-- Incoming Call State -->
+    <div id="incoming-state" class="call-state active">
+        <div class="call-header">
+            <div class="caller-avatar-large">
+                {% if avatar_path and avatar_path != '/static/images/default_avatar.png' %}
+                <i class="fa-solid fa-user"></i>
+                {% else %}
+                <i class="fa-solid fa-user"></i>
+                {% endif %}
+            </div>
+            <h1 class="caller-name-large">{{ caller_name }}</h1>
+            <p class="caller-phone-large">行動電話 {{ caller_phone }}</p>
+        </div>
+        
+        <div class="call-actions-incoming">
+            <div class="action-btn-group">
+                <button class="call-btn btn-reject" onclick="rejectCall()">
+                    <i class="fa-solid fa-phone-slash"></i>
+                </button>
+                <span>拒絕</span>
+            </div>
+            <div class="action-btn-group">
+                <button class="call-btn btn-accept" onclick="acceptCall()">
+                    <i class="fa-solid fa-phone"></i>
+                </button>
+                <span>接聽</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Call State -->
+    <div id="active-state" class="call-state">
+        <div class="call-header active-header">
+            <h1 class="caller-name-large">{{ caller_name }}</h1>
+            <p class="call-timer" id="call-timer">00:00</p>
+        </div>
+        
+        <div class="call-grid">
+            <div class="grid-item">
+                <button class="grid-btn"><i class="fa-solid fa-microphone-slash"></i></button>
+                <span>靜音</span>
+            </div>
+            <div class="grid-item">
+                <button class="grid-btn"><i class="fa-solid fa-keyboard"></i></button>
+                <span>鍵盤</span>
+            </div>
+            <div class="grid-item">
+                <button class="grid-btn"><i class="fa-solid fa-volume-high"></i></button>
+                <span>擴音</span>
+            </div>
+            <div class="grid-item">
+                <button class="grid-btn"><i class="fa-solid fa-plus"></i></button>
+                <span>新增通話</span>
+            </div>
+            <div class="grid-item">
+                <button class="grid-btn"><i class="fa-solid fa-video"></i></button>
+                <span>視訊通話</span>
+            </div>
+            <div class="grid-item">
+                <button class="grid-btn"><i class="fa-regular fa-user"></i></button>
+                <span>聯絡人</span>
+            </div>
+        </div>
+        
+        <div class="call-actions-active">
+            <button class="call-btn btn-reject" onclick="endCall()">
+                <i class="fa-solid fa-phone-slash"></i>
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
