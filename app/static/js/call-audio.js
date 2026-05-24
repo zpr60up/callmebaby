@@ -208,6 +208,78 @@ class CallAudioManager {
             navigator.vibrate(0);
         }
     }
+
+    /**
+     * 播放擬真訊息提示音（使用 Web Audio API 合成）
+     */
+    playNotificationSound(style = 'ios') {
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const now = ctx.currentTime;
+
+            if (style === 'ios') {
+                // iOS 經典三音符 (Tri-tone): G5(784Hz) -> C6(1046.5Hz) -> E6(1318.5Hz)
+                const notes = [
+                    { freq: 784.0, start: 0, dur: 0.15 },
+                    { freq: 1046.5, start: 0.12, dur: 0.15 },
+                    { freq: 1318.5, start: 0.24, dur: 0.4 }
+                ];
+                notes.forEach(note => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(note.freq, now + note.start);
+
+                    gain.gain.setValueAtTime(0, now + note.start);
+                    gain.gain.linearRampToValueAtTime(0.2, now + note.start + 0.02);
+                    gain.gain.setValueAtTime(0.2, now + note.start + note.dur - 0.02);
+                    gain.gain.linearRampToValueAtTime(0, now + note.start + note.dur);
+
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+
+                    osc.start(now + note.start);
+                    osc.stop(now + note.start + note.dur);
+                });
+            } else {
+                // Android 經典雙音符 (Ding-dong): A5(880Hz) -> C#6(1100Hz)
+                const notes = [
+                    { freq: 880.0, start: 0, dur: 0.12 },
+                    { freq: 1100.0, start: 0.1, dur: 0.3 }
+                ];
+                notes.forEach(note => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(note.freq, now + note.start);
+
+                    gain.gain.setValueAtTime(0, now + note.start);
+                    gain.gain.linearRampToValueAtTime(0.2, now + note.start + 0.02);
+                    gain.gain.setValueAtTime(0.2, now + note.start + note.dur - 0.02);
+                    gain.gain.linearRampToValueAtTime(0, now + note.start + note.dur);
+
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+
+                    osc.start(now + note.start);
+                    osc.stop(now + note.start + note.dur);
+                });
+            }
+        } catch (e) {
+            console.warn('[Audio] 無法播放訊息提示音:', e);
+        }
+    }
+
+    /**
+     * 訊息觸發單次震動
+     */
+    vibrateOnce() {
+        if ('vibrate' in navigator) {
+            navigator.vibrate([200, 100, 200]);
+        }
+    }
 }
 
 // 全域實例

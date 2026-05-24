@@ -443,6 +443,20 @@
     50%, 100% { transform: rotate(0deg); }
 }
 
+.btn-call-info {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: #fff;
+}
+
+.btn-call-info:hover {
+    transform: scale(1.03);
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+}
+
+.btn-call-info .material-icons-round {
+    font-size: 16px;
+}
+
 .btn-call-danger {
     background: rgba(244, 63, 94, 0.15);
     color: var(--danger);
@@ -691,9 +705,13 @@
                         </div>
                     </div>
                     <div class="caller-actions">
-                        <a href="{{ url_for('call.incoming', caller_id=c['id']) }}" class="btn-call btn-call-primary" id="trigger-call-{{ c['id'] }}">
+                        <a href="javascript:void(0);" onclick="triggerCall({{ c['id'] }}, '{{ c['name'] }}', '{{ c['call_style'] }}')" class="btn-call btn-call-primary" id="trigger-call-{{ c['id'] }}">
                             <span class="material-icons-round">call</span>
                             來電
+                        </a>
+                        <a href="javascript:void(0);" onclick="triggerMessage({{ c['id'] }}, '{{ c['name'] }}', '{{ c['call_style'] }}', '{{ c['voice_file'] }}')" class="btn-call btn-call-info" id="trigger-msg-{{ c['id'] }}">
+                            <span class="material-icons-round">message</span>
+                            訊息
                         </a>
                         <form action="{{ url_for('call.delete_caller', caller_id=c['id']) }}" method="POST" style="margin:0" onsubmit="return confirm('確定要刪除「{{ c['name'] }}」嗎？')">
                             <button type="submit" class="btn-call btn-call-danger" style="width:100%">
@@ -714,4 +732,106 @@
 
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let countdownInterval = null;
+let countdownSeconds = 0;
+
+function showCountdown(seconds, callback) {
+    let overlay = document.getElementById('custom-countdown-overlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'custom-countdown-overlay';
+        overlay.style.position = 'fixed';
+        overlay.style.inset = '0';
+        overlay.style.background = 'rgba(15, 23, 42, 0.96)';
+        overlay.style.zIndex = '9999';
+        overlay.style.display = 'flex';
+        overlay.style.flexDirection = 'column';
+        overlay.style.alignItems = 'center';
+        overlay.style.justifyContent = 'center';
+        overlay.style.fontFamily = 'system-ui, sans-serif';
+        overlay.style.color = '#fff';
+        
+        overlay.innerHTML = `
+            <div style="text-align: center; padding: 20px;">
+                <h2 id="countdown-title" style="font-size: 24px; margin-bottom: 15px; font-weight: 600;">脫逃準備中...</h2>
+                <div style="width: 80px; height: 80px; border-radius: 50%; border: 4px solid rgba(255,255,255,0.1); border-top-color: #3b82f6; animation: spin 1s linear infinite; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;">
+                    <span id="countdown-number" style="font-size: 26px; font-weight: bold; color: #3b82f6;">5</span>
+                </div>
+                <p style="color: #94a3b8; font-size: 14px; margin-bottom: 30px;">請將手機放置於桌面或口袋，隨後將觸發模擬</p>
+                <button id="countdown-cancel-btn" style="background: #ef4444; color: #fff; border: none; padding: 12px 28px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.2s;">取消</button>
+            </div>
+            <style>
+                @keyframes spin { to { transform: rotate(360deg); } }
+            </style>
+        `;
+        document.body.appendChild(overlay);
+    }
+    
+    overlay.style.display = 'flex';
+    countdownSeconds = seconds;
+    document.getElementById('countdown-number').textContent = countdownSeconds;
+    
+    document.getElementById('countdown-cancel-btn').onclick = () => {
+        clearInterval(countdownInterval);
+        overlay.style.display = 'none';
+    };
+    
+    countdownInterval = setInterval(() => {
+        countdownSeconds--;
+        if (countdownSeconds <= 0) {
+            clearInterval(countdownInterval);
+            overlay.style.display = 'none';
+            callback();
+        } else {
+            document.getElementById('countdown-number').textContent = countdownSeconds;
+        }
+    }, 1000);
+}
+
+function triggerCall(callerId, callerName, callStyle) {
+    const delayStr = prompt(`【模擬來電設定】\n來電者：${callerName}\n\n請輸入延遲秒數 (輸入 0 代表即時來電，或輸入 10, 30, 60 等秒數):`, "0");
+    if (delayStr === null) return;
+    
+    const delay = parseInt(delayStr) || 0;
+    const targetUrl = `/call/incoming/${callerId}`;
+    
+    if (delay > 0) {
+        showCountdown(delay, () => {
+            window.location.href = targetUrl;
+        });
+    } else {
+        window.location.href = targetUrl;
+    }
+}
+
+function triggerMessage(callerId, callerName, callStyle, voiceFile) {
+    const defaultMsgs = {
+        'voice_family': '爸：你怎麼還沒回家？快點回來，媽媽在找你！',
+        'voice_boss': '老闆：今晚的專案報告有問題，你現在能回公司一趟嗎？',
+        'voice_friend': '好朋友：我們在唱歌，快過來啦！就差你了！'
+    };
+    const defaultMsg = defaultMsgs[voiceFile] || '你在哪？快回來！';
+    
+    const customMsg = prompt(`【模擬訊息設定】\n傳送者：${callerName}\n\n請輸入欲顯示的簡訊內容:`, defaultMsg);
+    if (customMsg === null) return;
+    
+    const delayStr = prompt(`【模擬訊息設定】\n\n請輸入延遲秒數 (輸入 0 代表即時訊息，或輸入 10, 30, 60 等秒數):`, "0");
+    if (delayStr === null) return;
+    
+    const delay = parseInt(delayStr) || 0;
+    const targetUrl = `/call/incoming_msg/${callerId}?message=${encodeURIComponent(customMsg)}`;
+    
+    if (delay > 0) {
+        showCountdown(delay, () => {
+            window.location.href = targetUrl;
+        });
+    } else {
+        window.location.href = targetUrl;
+    }
+}
+</script>
 {% endblock %}
