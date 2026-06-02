@@ -17,6 +17,9 @@ def create_app():
     from app.routes.scenario_routes import scenario_bp
     app.register_blueprint(scenario_bp)
     
+    from app.routes.call import call_bp
+    app.register_blueprint(call_bp)
+    
     # Ensure database is initialized with all tables
     with app.app_context():
         from app.models.db import init_db
