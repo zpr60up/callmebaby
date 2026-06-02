@@ -31,15 +31,185 @@
             </div>
         </div>
 
+        {% if active_scenario_id == scenario.id %}
+        <div class="active-actions">
+            <div style="font-size: 0.85rem; color: #818cf8; font-weight: 600; margin-bottom: 0.6rem; display: flex; align-items: center; gap: 0.3rem;">
+                <span>✨ 劇本已套用，請選擇觸發方式：</span>
+            </div>
+            
+            <div class="style-selector">
+                <div class="style-option">
+                    <input type="radio" name="os_style_{{ scenario.id }}" id="ios_{{ scenario.id }}" value="ios" checked>
+                    <label for="ios_{{ scenario.id }}">🍎 iOS 風格</label>
+                </div>
+                <div class="style-option">
+                    <input type="radio" name="os_style_{{ scenario.id }}" id="android_{{ scenario.id }}" value="android">
+                    <label for="android_{{ scenario.id }}">🤖 Android 風格</label>
+                </div>
+            </div>
+            
+            <div class="trigger-buttons">
+                <button type="button" class="btn-trigger btn-trigger-now" onclick="startCallSimulation({{ scenario.id }}, true)">
+                    <span>📞 立即來電</span>
+                </button>
+                <button type="button" class="btn-trigger btn-trigger-delay" onclick="startCallSimulation({{ scenario.id }}, false)">
+                    <span>⏱️ 延遲來電</span>
+                </button>
+            </div>
+        </div>
+        {% else %}
         <form action="{{ url_for('scenario.apply_scenario', id=scenario.id) }}" method="POST"
             style="margin-top: 1.5rem;">
-            {% if active_scenario_id == scenario.id %}
-            <button type="button" class="btn btn-outline" disabled>已套用此劇本</button>
-            {% else %}
             <button type="submit" class="btn btn-primary">套用此劇本</button>
-            {% endif %}
         </form>
+        {% endif %}
     </div>
     {% endfor %}
 </div>
+
+<!-- Countdown Overlay -->
+<div id="countdown-overlay" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.96); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; color: #fff; font-family: 'Inter', sans-serif;">
+    <div style="text-align: center; padding: 20px;">
+        <h2 style="font-size: 1.8rem; margin-bottom: 1.5rem; font-weight: 600; background: linear-gradient(135deg, #6366f1, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">來電準備中...</h2>
+        <div style="width: 100px; height: 100px; border-radius: 50%; border: 4px solid rgba(255,255,255,0.1); border-top-color: #6366f1; animation: spin 1s linear infinite; margin: 0 auto 1.5rem; display: flex; align-items: center; justify-content: center;">
+            <span id="countdown-number" style="font-size: 2.2rem; font-weight: bold; color: #6366f1;">5</span>
+        </div>
+        <p style="color: #94a3b8; font-size: 0.95rem; margin-bottom: 2rem;">請將手機放置於桌面或口袋，稍後將觸發模擬來電</p>
+        <button id="countdown-cancel-btn" style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); padding: 10px 24px; border-radius: 8px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: background 0.2s;">取消</button>
+    </div>
+</div>
+
+<style>
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    .active-actions {
+        margin-top: 1.2rem;
+        padding-top: 1.2rem;
+        border-top: 1px dashed rgba(255, 255, 255, 0.1);
+    }
+    
+    .style-selector {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 0.8rem;
+    }
+    
+    .style-option {
+        flex: 1;
+        position: relative;
+    }
+    
+    .style-option input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+    
+    .style-option label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+        padding: 0.6rem;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        color: var(--text-light);
+        cursor: pointer;
+        font-size: 0.85rem;
+        transition: all 0.2s;
+    }
+    
+    .style-option input[type="radio"]:checked + label {
+        background: rgba(99, 102, 241, 0.15);
+        border-color: #6366f1;
+        color: #818cf8;
+        font-weight: 500;
+    }
+    
+    .trigger-buttons {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .btn-trigger {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+        padding: 0.7rem;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none;
+        text-decoration: none;
+    }
+    
+    .btn-trigger-now {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: #fff;
+    }
+    
+    .btn-trigger-now:hover {
+        box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+        transform: translateY(-1px);
+    }
+    
+    .btn-trigger-delay {
+        background: linear-gradient(135deg, #6366f1, #4f46e5);
+        color: #fff;
+    }
+    
+    .btn-trigger-delay:hover {
+        box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+        transform: translateY(-1px);
+    }
+</style>
+
+<script>
+    let countdownTimer = null;
+
+    function startCallSimulation(scenarioId, instant) {
+        // Get selected OS style
+        const osStyle = document.querySelector('input[name="os_style_' + scenarioId + '"]:checked').value;
+        const targetUrl = "{{ url_for('call.incoming_scen') }}?scenario_id=" + scenarioId + "&os_style=" + osStyle;
+        
+        if (instant) {
+            window.location.href = targetUrl;
+            return;
+        }
+        
+        const delayStr = prompt("【預約來電設定】\n請輸入延遲秒數 (例如 5, 10, 30 等秒數):", "5");
+        if (delayStr === null) return;
+        
+        const delay = parseInt(delayStr) || 5;
+        const overlay = document.getElementById('countdown-overlay');
+        const numEl = document.getElementById('countdown-number');
+        const cancelBtn = document.getElementById('countdown-cancel-btn');
+        
+        overlay.style.display = 'flex';
+        let remaining = delay;
+        numEl.textContent = remaining;
+        
+        cancelBtn.onclick = () => {
+            clearInterval(countdownTimer);
+            overlay.style.display = 'none';
+        };
+        
+        countdownTimer = setInterval(() => {
+            remaining--;
+            if (remaining <= 0) {
+                clearInterval(countdownTimer);
+                overlay.style.display = 'none';
+                window.location.href = targetUrl;
+            } else {
+                numEl.textContent = remaining;
+            }
+        }, 1000);
+    }
+</script>
 {% endblock %}

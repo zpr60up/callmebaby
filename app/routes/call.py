@@ -150,3 +150,33 @@ def incoming_msg(caller_id):
         message_text = default_msgs.get(c['voice_file'], '你在哪？快回來！')
 
     return render_template('call/incoming_msg.html', caller=c, message=message_text)
+
+
+@call_bp.route('/incoming_scen', endpoint='incoming_scen', methods=['GET'])
+def incoming_scen():
+    """來電響鈴畫面（劇本版）。"""
+    os_style = request.args.get('os_style', 'ios')
+    scenario_id = request.args.get('scenario_id')
+    
+    from app.models.scenario import Scenario
+    scenario = Scenario.get_by_id(scenario_id)
+    if not scenario:
+        flash('找不到該劇本', 'error')
+        return redirect(url_for('scenario.index'))
+        
+    return render_template('call/incoming.html', os_style=os_style, scenario=scenario)
+
+
+@call_bp.route('/active_scen', endpoint='active', methods=['GET'])
+def active_scen():
+    """通話進行中畫面（劇本版）。"""
+    os_style = request.args.get('os_style', 'ios')
+    scenario_id = request.args.get('scenario_id')
+    
+    from app.models.scenario import Scenario
+    scenario = Scenario.get_by_id(scenario_id)
+    if not scenario:
+        flash('找不到該劇本', 'error')
+        return redirect(url_for('scenario.index'))
+        
+    return render_template('call/active.html', os_style=os_style, scenario=scenario)
