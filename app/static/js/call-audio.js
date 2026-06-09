@@ -41,27 +41,36 @@ class CallAudioManager {
     }
 
     /**
-     * 建立鈴聲（使用 Web Audio API 合成）
+     * 建立鈴聲（使用 Web Audio API）
      */
-    createRingtone() {
+    createRingtone(style = 'ios') {
         try {
             this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            this._playRingtoneLoop();
+            this._playRingtoneLoop(style);
         } catch (e) {
             console.warn('[Audio] 無法建立 AudioContext:', e);
         }
     }
 
-    _playRingtoneLoop() {
+    _playRingtoneLoop(style = 'ios') {
         if (!this.audioCtx || this.ringtoneStopped) return;
 
         const ctx = this.audioCtx;
         const now = ctx.currentTime;
 
-        // 模擬電話鈴聲：雙音交替
-        const frequencies = [440, 480]; // 標準電話鈴聲頻率
-        const duration = 1.0;
-        const pause = 2.0;
+        let frequencies, duration, pause;
+
+        if (style === 'ios') {
+            // iOS 模擬：柔和的琶音和較快的節奏
+            frequencies = [440, 554, 659]; 
+            duration = 1.2;
+            pause = 2.0;
+        } else {
+            // Android 模擬：經典雙音頻頻率
+            frequencies = [425, 480];
+            duration = 1.0;
+            pause = 3.0;
+        }
 
         frequencies.forEach(freq => {
             const osc = ctx.createOscillator();
@@ -84,16 +93,16 @@ class CallAudioManager {
 
         // 循環播放
         this.ringtoneTimer = setTimeout(() => {
-            this._playRingtoneLoop();
+            this._playRingtoneLoop(style);
         }, (duration + pause) * 1000);
     }
 
     /**
      * 開始播放鈴聲
      */
-    startRinging() {
+    startRinging(style = 'ios') {
         this.ringtoneStopped = false;
-        this.createRingtone();
+        this.createRingtone(style);
         this.tryVibrate();
     }
 
