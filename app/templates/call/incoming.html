@@ -45,8 +45,8 @@
     <input type="hidden" id="active-call-url" value="{{ url_for('call.active', os_style=os_style, scenario_id=scenario.id) }}">
     <input type="hidden" id="setup-url" value="{{ url_for('scenario.index') }}">
 
-    <script src="{{ url_for('static', filename='js/call-audio.js') }}?v=4"></script>
-    <script src="{{ url_for('static', filename='js/call-incoming.js') }}?v=4"></script>
+    <script src="{{ url_for('static', filename='js/call-audio.js') }}?v=5"></script>
+    <script src="{{ url_for('static', filename='js/call-incoming.js') }}?v=5"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             startIncomingCall('{{ os_style }}');

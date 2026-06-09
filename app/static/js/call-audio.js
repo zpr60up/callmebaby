@@ -123,12 +123,25 @@ class CallAudioManager {
     }
 
     /**
-     * 播放預錄語音（使用 TTS）
+     * 開始播放來言語音
      */
     playVoice(voiceFile) {
+        if (!voiceFile) return;
+
+        // 如果是自訂錄音檔 (以 upload_ 開頭)
+        if (voiceFile.startsWith('upload_')) {
+            const audioUrl = `/static/audio/uploads/${voiceFile}`;
+            this.customAudio = new Audio(audioUrl);
+            this.customAudio.volume = this.isSpeaker ? 1.0 : 0.2;
+            
+            // 監聽播放事件
+            this.customAudio.play().catch(e => console.warn('[Audio] 無法播放自訂錄音:', e));
+            return;
+        }
+
         const script = this.voiceScripts[voiceFile];
         if (!script) {
-            console.warn('[Audio] 找不到語音腳本:', voiceFile);
+            console.warn('[Audio] 找不到語音腳本', voiceFile);
             return;
         }
 
@@ -152,28 +165,14 @@ class CallAudioManager {
 
                 // 嘗試使用中文語音
                 const voices = speechSynthesis.getVoices();
-                let zhVoice = null;
-                
-                // 如果是爸爸或老闆，嘗試尋找男性聲音
-                if (voiceFile === 'voice_family' || voiceFile === 'voice_boss') {
-                    zhVoice = voices.find(v => v.lang.startsWith('zh') && (
-                        v.name.toLowerCase().includes('male') || 
-                        v.name.includes('Zhiwei') || 
-                        v.name.includes('Yunxi') ||
-                        v.name.includes('Yunjian')
-                    ));
+                const zhVoice = voices.find(v => v.lang.includes('zh') || v.lang.includes('cmn'));
+                if (zhVoice) {
+                    utterance.voice = zhVoice;
                 }
-                
-                // 如果沒有找到男性聲音，或非男性角色，退回預設中文語音
-                if (!zhVoice) {
-                    zhVoice = voices.find(v => v.lang.startsWith('zh'));
-                }
-                
-                if (zhVoice) utterance.voice = zhVoice;
 
                 speechSynthesis.speak(utterance);
             }, line.delay);
-
+            
             this.voiceTimeouts.push(timeout);
         });
     }
@@ -189,6 +188,10 @@ class CallAudioManager {
         if ('speechSynthesis' in window) {
             speechSynthesis.cancel();
         }
+        if (this.customAudio) {
+            this.customAudio.pause();
+            this.customAudio.currentTime = 0;
+        }
     }
 
     /**
@@ -196,6 +199,14 @@ class CallAudioManager {
      */
     toggleMute() {
         this.isMuted = !this.isMuted;
+        
+        // 靜音時立即停止當下正在說話的語音
+        if (this.isMuted) {
+            if ('speechSynthesis' in window) speechSynthesis.cancel();
+            if (this.customAudio) this.customAudio.muted = true;
+        } else {
+            if (this.customAudio) this.customAudio.muted = false;
+        }
         return this.isMuted;
     }
 
@@ -204,6 +215,9 @@ class CallAudioManager {
      */
     toggleSpeaker() {
         this.isSpeaker = !this.isSpeaker;
+        if (this.customAudio) {
+            this.customAudio.volume = this.isSpeaker ? 1.0 : 0.2;
+        }
         return this.isSpeaker;
     }
 

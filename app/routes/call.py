@@ -4,9 +4,31 @@ Call Routes — 來電模擬功能路由
 """
 
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+import os
+import uuid
 from app.models import caller as caller_model
 
 call_bp = Blueprint('call', __name__, url_prefix='/call')
+
+@call_bp.route('/upload_voice', methods=['POST'])
+def upload_voice():
+    if 'audio' not in request.files:
+        return jsonify({'error': 'No audio file provided'}), 400
+    
+    file = request.files['audio']
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+        
+    ext = file.filename.rsplit('.', 1)[1].lower() if '.' in file.filename else 'webm'
+    filename = f"upload_{uuid.uuid4().hex[:8]}.{ext}"
+    
+    upload_folder = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static', 'audio', 'uploads')
+    os.makedirs(upload_folder, exist_ok=True)
+    
+    file_path = os.path.join(upload_folder, filename)
+    file.save(file_path)
+    
+    return jsonify({'filename': filename}), 200
 
 
 # ─────────────────────────────────────────────

@@ -88,9 +88,9 @@
     <input type="hidden" id="caller-voice" value="{{ tts_voice }}">
     <input type="hidden" id="setup-url" value="{{ url_for('scenario.index') }}">
 
-    <script src="{{ url_for('static', filename='js/call-audio.js') }}?v=3"></script>
-    <script src="{{ url_for('static', filename='js/call-incoming.js') }}?v=3"></script>
-    <script src="{{ url_for('static', filename='js/call-timer.js') }}?v=3"></script>
+    <script src="{{ url_for('static', filename='js/call-audio.js') }}?v=5"></script>
+    <script src="{{ url_for('static', filename='js/call-incoming.js') }}?v=5"></script>
+    <script src="{{ url_for('static', filename='js/call-timer.js') }}?v=5"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             startActiveCall();

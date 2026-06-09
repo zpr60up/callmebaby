@@ -660,7 +660,28 @@
                                 朋友邀約
                             </label>
                         </div>
+                        <div class="voice-chip">
+                            <input type="radio" name="voice_file" id="vf_record" value="record_custom">
+                            <label for="vf_record">
+                                <span class="material-icons-round">mic</span>
+                                現場錄音
+                            </label>
+                        </div>
                     </div>
+                </div>
+
+                <!-- 錄音控制面板 -->
+                <div class="form-group" id="record-panel" style="display:none; background:rgba(0,0,0,0.2); padding:15px; border-radius:8px; margin-bottom:16px;">
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <button type="button" id="btn-start-record" class="btn-call btn-call-primary" style="flex:1;">
+                            <span class="material-icons-round" style="font-size:16px;">mic</span> 開始錄音
+                        </button>
+                        <button type="button" id="btn-stop-record" class="btn-call btn-call-danger" style="flex:1; display:none;">
+                            <span class="material-icons-round" style="font-size:16px;">stop</span> 停止錄音
+                        </button>
+                    </div>
+                    <div id="record-status" style="margin-top:10px; font-size:13px; color:#94a3b8; text-align:center;">尚未錄音</div>
+                    <audio id="record-preview" controls style="width:100%; margin-top:10px; display:none; height:32px;"></audio>
                 </div>
 
                 <!-- 來電風格 -->
@@ -832,6 +853,114 @@ function triggerMessage(callerId, callerName, callStyle, voiceFile) {
     } else {
         window.location.href = targetUrl;
     }
+}
+
+// 錄音系統邏輯
+let mediaRecorder;
+let audioChunks = [];
+let recordedBlob = null;
+
+const radioRecord = document.getElementById('vf_record');
+const radioOthers = document.querySelectorAll('input[name="voice_file"]:not(#vf_record)');
+const recordPanel = document.getElementById('record-panel');
+
+if (radioRecord && recordPanel) {
+    radioRecord.addEventListener('change', () => {
+        recordPanel.style.display = 'block';
+    });
+    radioOthers.forEach(radio => {
+        radio.addEventListener('change', () => {
+            recordPanel.style.display = 'none';
+        });
+    });
+
+    const btnStart = document.getElementById('btn-start-record');
+    const btnStop = document.getElementById('btn-stop-record');
+    const statusText = document.getElementById('record-status');
+    const audioPreview = document.getElementById('record-preview');
+
+    btnStart.addEventListener('click', async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+            audioChunks = [];
+
+            mediaRecorder.ondataavailable = e => {
+                if (e.data.size > 0) audioChunks.push(e.data);
+            };
+
+            mediaRecorder.onstop = () => {
+                recordedBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                const audioUrl = URL.createObjectURL(recordedBlob);
+                audioPreview.src = audioUrl;
+                audioPreview.style.display = 'block';
+                statusText.textContent = '錄音完成！可點擊播放預覽。';
+                
+                stream.getTracks().forEach(track => track.stop());
+            };
+
+            mediaRecorder.start();
+            btnStart.style.display = 'none';
+            btnStop.style.display = 'block';
+            statusText.innerHTML = '<span style="color:#ef4444;">● 正在錄音中...</span>';
+            audioPreview.style.display = 'none';
+        } catch (err) {
+            console.error('麥克風權限錯誤', err);
+            alert('無法存取麥克風，請確認權限是否開啟！（部分行動裝置需在 HTTPS 環境下才能使用錄音功能）');
+        }
+    });
+
+    btnStop.addEventListener('click', () => {
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+            mediaRecorder.stop();
+            btnStart.style.display = 'block';
+            btnStart.innerHTML = '<span class="material-icons-round" style="font-size:16px;">mic</span> 重新錄音';
+            btnStop.style.display = 'none';
+        }
+    });
+
+    // 攔截表單送出
+    const addForm = document.getElementById('add-caller-form');
+    addForm.addEventListener('submit', async (e) => {
+        if (radioRecord.checked) {
+            e.preventDefault();
+            
+            if (!recordedBlob) {
+                alert('您尚未錄製任何聲音！請先點擊「開始錄音」。');
+                return;
+            }
+            
+            const submitBtn = addForm.querySelector('.btn-submit');
+            const origText = submitBtn.innerHTML;
+            submitBtn.textContent = '上傳音檔中...';
+            submitBtn.disabled = true;
+            
+            const formData = new FormData();
+            formData.append('audio', recordedBlob, 'custom.webm');
+            
+            try {
+                const res = await fetch('{{ url_for("call.upload_voice") }}', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                
+                if (data.filename) {
+                    radioRecord.value = data.filename;
+                    addForm.submit();
+                } else {
+                    alert('上傳失敗：' + (data.error || '未知錯誤'));
+                    submitBtn.innerHTML = origText;
+                    submitBtn.disabled = false;
+                }
+            } catch (err) {
+                console.error(err);
+                alert('上傳發生錯誤！');
+                submitBtn.innerHTML = origText;
+                submitBtn.disabled = false;
+            }
+        }
+    });
 }
 </script>
 {% endblock %}
