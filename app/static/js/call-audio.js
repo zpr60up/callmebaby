@@ -137,7 +137,23 @@ class CallAudioManager {
 
                 // 嘗試使用中文語音
                 const voices = speechSynthesis.getVoices();
-                const zhVoice = voices.find(v => v.lang.startsWith('zh'));
+                let zhVoice = null;
+                
+                // 如果是爸爸或老闆，嘗試尋找男性聲音
+                if (voiceFile === 'voice_family' || voiceFile === 'voice_boss') {
+                    zhVoice = voices.find(v => v.lang.startsWith('zh') && (
+                        v.name.toLowerCase().includes('male') || 
+                        v.name.includes('Zhiwei') || 
+                        v.name.includes('Yunxi') ||
+                        v.name.includes('Yunjian')
+                    ));
+                }
+                
+                // 如果沒有找到男性聲音，或非男性角色，退回預設中文語音
+                if (!zhVoice) {
+                    zhVoice = voices.find(v => v.lang.startsWith('zh'));
+                }
+                
                 if (zhVoice) utterance.voice = zhVoice;
 
                 speechSynthesis.speak(utterance);
