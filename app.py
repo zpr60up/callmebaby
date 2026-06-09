@@ -47,7 +47,24 @@ with app.app_context():
     db_path = os.path.join('instance', 'database.db')
     if not os.path.exists(db_path):
         init_db()
+    else:
+        try:
+            conn = sqlite3.connect(db_path)
+            conn.execute('''
+                CREATE TABLE IF NOT EXISTS recordings (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    filename TEXT NOT NULL,
+                    display_name TEXT NOT NULL,
+                    created_at TEXT DEFAULT (datetime('now','localtime'))
+                );
+            ''')
+            conn.commit()
+            conn.close()
+            print('[Call Me Baby] 確保 recordings 資料表已建立！')
+        except Exception as e:
+            print(f'[Call Me Baby] 升級資料庫時出錯: {e}')
 
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
+
