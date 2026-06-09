@@ -30,3 +30,34 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 });
+
+// Added for active.html grid buttons
+function toggleMute(btnElement) {
+    const audio = document.getElementById('scenario-audio');
+    const iconCircle = btnElement.querySelector('.icon-circle');
+    
+    if (audio) {
+        audio.muted = !audio.muted;
+        if (audio.muted) {
+            iconCircle.style.background = 'rgba(255, 255, 255, 1)';
+            iconCircle.style.color = '#000';
+            btnElement.querySelector('.label').textContent = '取消靜音';
+        } else {
+            iconCircle.style.background = 'rgba(255, 255, 255, 0.15)';
+            iconCircle.style.color = '#fff';
+            btnElement.querySelector('.label').textContent = '靜音';
+        }
+    }
+}
+
+function toggleSpeaker(btnElement) {
+    const iconCircle = btnElement.querySelector('.icon-circle');
+    // We just toggle the visual state since HTMLAudioElement doesn't have a direct speaker toggle api on standard desktop browsers.
+    if (iconCircle.style.background === 'rgb(255, 255, 255)' || iconCircle.style.background === 'rgba(255, 255, 255, 1)') {
+        iconCircle.style.background = 'rgba(255, 255, 255, 0.15)';
+        iconCircle.style.color = '#fff';
+    } else {
+        iconCircle.style.background = 'rgba(255, 255, 255, 1)';
+        iconCircle.style.color = '#000';
+    }
+}
