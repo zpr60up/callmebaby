@@ -19,7 +19,7 @@
                 <div class="icon-circle" id="icon-mute">🎙️</div>
                 <span class="label" id="label-mute">靜音</span>
             </div>
-            <div class="grid-btn" onclick="alert('模擬來電期間無法使用鍵盤')">
+            <div class="grid-btn" id="btn-keypad" onclick="toggleKeypad()">
                 <div class="icon-circle">🔢</div>
                 <span class="label">鍵盤</span>
             </div>
@@ -27,15 +27,15 @@
                 <div class="icon-circle" id="icon-speaker">🔊</div>
                 <span class="label" id="label-speaker">擴音</span>
             </div>
-            <div class="grid-btn" onclick="alert('模擬來電期間無法新增通話')">
+            <div class="grid-btn">
                 <div class="icon-circle">➕</div>
                 <span class="label">新增通話</span>
             </div>
-            <div class="grid-btn" onclick="alert('模擬來電期間無法使用 FaceTime')">
+            <div class="grid-btn">
                 <div class="icon-circle">💬</div>
                 <span class="label">FaceTime</span>
             </div>
-            <div class="grid-btn" onclick="alert('模擬來電期間無法查看聯絡人')">
+            <div class="grid-btn">
                 <div class="icon-circle">👤</div>
                 <span class="label">聯絡人</span>
             </div>
@@ -47,6 +47,30 @@
                     <span style="transform: rotate(135deg);">📞</span>
                 </a>
             </div>
+        </div>
+    </div>
+
+    <!-- 數字鍵盤 overlay -->
+    <div class="keypad-overlay" id="keypad-overlay" style="display:none;">
+        <div class="keypad-header">
+            <span class="keypad-number" id="keypad-display"></span>
+            <button class="keypad-close" onclick="toggleKeypad()">
+                <span class="material-icons-round">⌨️</span>
+            </button>
+        </div>
+        <div class="keypad-grid">
+            <button class="keypad-key" onclick="pressKey('1')"><span class="key-num">1</span><span class="key-sub"></span></button>
+            <button class="keypad-key" onclick="pressKey('2')"><span class="key-num">2</span><span class="key-sub">ABC</span></button>
+            <button class="keypad-key" onclick="pressKey('3')"><span class="key-num">3</span><span class="key-sub">DEF</span></button>
+            <button class="keypad-key" onclick="pressKey('4')"><span class="key-num">4</span><span class="key-sub">GHI</span></button>
+            <button class="keypad-key" onclick="pressKey('5')"><span class="key-num">5</span><span class="key-sub">JKL</span></button>
+            <button class="keypad-key" onclick="pressKey('6')"><span class="key-num">6</span><span class="key-sub">MNO</span></button>
+            <button class="keypad-key" onclick="pressKey('7')"><span class="key-num">7</span><span class="key-sub">PQRS</span></button>
+            <button class="keypad-key" onclick="pressKey('8')"><span class="key-num">8</span><span class="key-sub">TUV</span></button>
+            <button class="keypad-key" onclick="pressKey('9')"><span class="key-num">9</span><span class="key-sub">WXYZ</span></button>
+            <button class="keypad-key" onclick="pressKey('*')"><span class="key-num">＊</span><span class="key-sub"></span></button>
+            <button class="keypad-key" onclick="pressKey('0')"><span class="key-num">0</span><span class="key-sub">+</span></button>
+            <button class="keypad-key" onclick="pressKey('#')"><span class="key-num">＃</span><span class="key-sub"></span></button>
         </div>
     </div>
 
