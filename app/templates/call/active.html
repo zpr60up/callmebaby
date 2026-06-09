@@ -15,17 +15,17 @@
         </div>
 
         <div class="keypad-grid">
-            <div class="grid-btn" onclick="toggleMute(this)">
-                <div class="icon-circle">🎙️</div>
-                <span class="label">靜音</span>
+            <div class="grid-btn" id="btn-mute" onclick="toggleMute()">
+                <div class="icon-circle" id="icon-mute">🎙️</div>
+                <span class="label" id="label-mute">靜音</span>
             </div>
             <div class="grid-btn" onclick="alert('模擬來電期間無法使用鍵盤')">
                 <div class="icon-circle">🔢</div>
                 <span class="label">鍵盤</span>
             </div>
-            <div class="grid-btn" onclick="toggleSpeaker(this)">
-                <div class="icon-circle">🔊</div>
-                <span class="label">擴音</span>
+            <div class="grid-btn" id="btn-speaker" onclick="toggleSpeaker()">
+                <div class="icon-circle" id="icon-speaker">🔊</div>
+                <span class="label" id="label-speaker">擴音</span>
             </div>
             <div class="grid-btn" onclick="alert('模擬來電期間無法新增通話')">
                 <div class="icon-circle">➕</div>
@@ -43,16 +43,31 @@
 
         <div class="active-actions">
             <div class="action-btn-wrapper">
-                <a href="{{ url_for('scenario.index') }}" class="action-btn btn-end" style="text-decoration:none;">
+                <a href="javascript:void(0)" onclick="endActiveCall()" class="action-btn btn-end" style="text-decoration:none;">
                     <span style="transform: rotate(135deg);">📞</span>
                 </a>
             </div>
         </div>
     </div>
 
-    <!-- 隱藏的語音播放器 -->
-    <audio id="scenario-audio" src="{{ url_for('static', filename='audio/' + scenario.audio_file) }}" autoplay></audio>
+    <!-- 判斷要播放的 TTS 語音腳本 -->
+    {% set tts_voice = 'voice_family' %}
+    {% if 'boss' in scenario.audio_file %}
+        {% set tts_voice = 'voice_boss' %}
+    {% elif 'delivery' in scenario.audio_file %}
+        {% set tts_voice = 'voice_friend' %}
+    {% endif %}
 
-    <script src="{{ url_for('static', filename='js/call.js') }}"></script>
+    <!-- 隱藏資料供 JS 使用 -->
+    <input type="hidden" id="caller-voice" value="{{ tts_voice }}">
+    <input type="hidden" id="setup-url" value="{{ url_for('scenario.index') }}">
+
+    <script src="{{ url_for('static', filename='js/call-audio.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/call-timer.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            startActiveCall();
+        });
+    </script>
 </body>
 </html>
