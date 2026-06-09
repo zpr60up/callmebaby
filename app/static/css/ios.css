@@ -129,4 +129,81 @@ body.ios-style {
 .ios-style .grid-btn .label {
     font-size: 13px;
     color: #fff;
+    margin-top: 4px;
+}
+
+.ios-style .grid-btn.active .icon-circle {
+    background-color: #fff;
+    color: #000;
+}
+
+/* Keypad Overlay */
+.ios-style .keypad-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 60px;
+    z-index: 100;
+}
+
+.ios-style .overlay-header {
+    height: 60px;
+    margin-bottom: 30px;
+}
+
+.ios-style .keypad-display {
+    font-size: 40px;
+    color: white;
+    letter-spacing: 2px;
+}
+
+.ios-style .numeric-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.ios-style .num-btn {
+    width: 75px;
+    height: 75px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.15);
+    border: none;
+    color: white;
+    font-size: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.ios-style .num-btn span {
+    font-size: 10px;
+    margin-top: -5px;
+}
+
+.ios-style .btn-hide-keypad {
+    margin-top: 40px;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+/* Base adjustment for grid-btn as button */
+.ios-style .grid-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: inherit;
+    cursor: pointer;
+    outline: none;
 }

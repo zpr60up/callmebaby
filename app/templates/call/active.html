@@ -15,30 +15,52 @@
         </div>
 
         <div class="keypad-grid">
-            <div class="grid-btn">
+            <button class="grid-btn" id="btn-mute" type="button">
                 <div class="icon-circle">🎙️</div>
                 <span class="label">靜音</span>
-            </div>
-            <div class="grid-btn">
+            </button>
+            <button class="grid-btn" id="btn-keypad" type="button">
                 <div class="icon-circle">🔢</div>
                 <span class="label">鍵盤</span>
-            </div>
-            <div class="grid-btn">
+            </button>
+            <button class="grid-btn" id="btn-speaker" type="button">
                 <div class="icon-circle">🔊</div>
                 <span class="label">擴音</span>
-            </div>
-            <div class="grid-btn">
+            </button>
+            <button class="grid-btn" id="btn-add-call" type="button">
                 <div class="icon-circle">➕</div>
                 <span class="label">新增通話</span>
-            </div>
-            <div class="grid-btn">
+            </button>
+            <button class="grid-btn" id="btn-facetime" type="button">
                 <div class="icon-circle">💬</div>
                 <span class="label">FaceTime</span>
-            </div>
-            <div class="grid-btn">
+            </button>
+            <button class="grid-btn" id="btn-contacts" type="button">
                 <div class="icon-circle">👤</div>
                 <span class="label">聯絡人</span>
+            </button>
+        </div>
+
+        <!-- 數字鍵盤蓋層 (初始隱藏) -->
+        <div id="keypad-overlay" class="keypad-overlay" style="display: none;">
+            <div class="overlay-header">
+                <span id="keypad-display" class="keypad-display"></span>
             </div>
+            <div class="numeric-grid">
+                <button class="num-btn" data-val="1">1</button>
+                <button class="num-btn" data-val="2">2<span>ABC</span></button>
+                <button class="num-btn" data-val="3">3<span>DEF</span></button>
+                <button class="num-btn" data-val="4">4<span>GHI</span></button>
+                <button class="num-btn" data-val="5">5<span>JKL</span></button>
+                <button class="num-btn" data-val="6">6<span>MNO</span></button>
+                <button class="num-btn" data-val="7">7<span>PQRS</span></button>
+                <button class="num-btn" data-val="8">8<span>TUV</span></button>
+                <button class="num-btn" data-val="9">9<span>WXYZ</span></button>
+                <button class="num-btn" data-val="*">*</button>
+                <button class="num-btn" data-val="0">0<span>+</span></button>
+                <button class="num-btn" data-val="#">#</button>
+            </div>
+            <button id="btn-hide-keypad" class="btn-hide-keypad">隱藏</button>
         </div>
 
         <div class="active-actions">
