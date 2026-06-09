@@ -588,6 +588,12 @@
             <div class="logo-icon">📱</div>
             <h1>Call Me Baby</h1>
             <p>設定來電者資訊，隨時觸發擬真來電</p>
+            <div style="margin-top: 16px; display: flex; justify-content: center; gap: 10px;">
+                <a href="{{ url_for('call.recordings') }}" class="meta-tag" style="padding: 8px 16px; font-size: 13px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; border: 1px solid rgba(108, 92, 231, 0.3); transition: all var(--transition-fast); border-radius: 20px;" onmouseover="this.style.background='rgba(108, 92, 231, 0.25)'" onmouseout="this.style.background='rgba(108, 92, 231, 0.15)'">
+                    <span class="material-icons-round" style="font-size: 16px;">mic</span>
+                    錄音系統管理
+                </a>
+            </div>
         </div>
 
         <!-- 新增來電者表單 -->
@@ -660,6 +666,19 @@
                                 朋友邀約
                             </label>
                         </div>
+                        
+                        <!-- 自訂錄音清單 -->
+                        {% if recordings %}
+                            {% for r in recordings %}
+                            <div class="voice-chip">
+                                <input type="radio" name="voice_file" id="vf_custom_{{ r['id'] }}" value="{{ r['filename'] }}">
+                                <label for="vf_custom_{{ r['id'] }}">
+                                    <span class="material-icons-round">mic</span>
+                                    {{ r['display_name'] }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        {% endif %}
                     </div>
                 </div>
 

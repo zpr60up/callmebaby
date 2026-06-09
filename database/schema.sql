@@ -23,3 +23,11 @@ WHERE NOT EXISTS (SELECT 1 FROM callers WHERE name = '老闆');
 INSERT INTO callers (name, phone, avatar, voice_file, call_style)
 SELECT '好朋友', '0978-123-456', 'avatar_friend.png', 'voice_friend', 'ios'
 WHERE NOT EXISTS (SELECT 1 FROM callers WHERE name = '好朋友');
+
+CREATE TABLE IF NOT EXISTS recordings (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    filename TEXT NOT NULL,
+    display_name TEXT NOT NULL,
+    created_at TEXT DEFAULT (datetime('now','localtime'))
+);
+

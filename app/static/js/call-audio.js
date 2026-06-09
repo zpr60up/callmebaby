@@ -108,12 +108,22 @@ class CallAudioManager {
     }
 
     /**
-     * 播放預錄語音（使用 TTS）
+     * 播放預錄語音（支援 TTS 與實體錄音檔）
      */
     playVoice(voiceFile) {
         const script = this.voiceScripts[voiceFile];
         if (!script) {
-            console.warn('[Audio] 找不到語音腳本:', voiceFile);
+            console.log('[Audio] 播放自訂錄音檔案:', voiceFile);
+            try {
+                this.voiceAudio = new Audio(`/static/audio/${voiceFile}`);
+                this.voiceAudio.muted = this.isMuted;
+                this.voiceAudio.volume = this.isSpeaker ? 1.0 : 0.7;
+                this.voiceAudio.play().catch(err => {
+                    console.error('[Audio] 自訂錄音檔播放失敗:', err);
+                });
+            } catch (err) {
+                console.error('[Audio] 無法初始化自訂音訊播放:', err);
+            }
             return;
         }
 
@@ -158,6 +168,10 @@ class CallAudioManager {
         if ('speechSynthesis' in window) {
             speechSynthesis.cancel();
         }
+        if (this.voiceAudio) {
+            this.voiceAudio.pause();
+            this.voiceAudio = null;
+        }
     }
 
     /**
@@ -165,6 +179,9 @@ class CallAudioManager {
      */
     toggleMute() {
         this.isMuted = !this.isMuted;
+        if (this.voiceAudio) {
+            this.voiceAudio.muted = this.isMuted;
+        }
         return this.isMuted;
     }
 
@@ -173,6 +190,9 @@ class CallAudioManager {
      */
     toggleSpeaker() {
         this.isSpeaker = !this.isSpeaker;
+        if (this.voiceAudio) {
+            this.voiceAudio.volume = this.isSpeaker ? 1.0 : 0.7;
+        }
         return this.isSpeaker;
     }
 
