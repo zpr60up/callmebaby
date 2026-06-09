@@ -1,5 +1,9 @@
 {% extends 'base.html' %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+{% endblock %}
+
 {% block content %}
 <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem;">
     <div>
@@ -31,15 +35,66 @@
             </div>
         </div>
 
+        <div style="display: flex; gap: 8px; margin-top: 1.5rem;">
+            <button type="button" class="btn btn-primary" onclick="simulateScenarioCall('{{ scenario.caller_name }}', '{{ scenario.caller_number }}', '{{ scenario.audio_file }}', '{{ scenario.avatar_path }}')" style="padding: 0.5rem; font-size: 0.85rem; flex: 1; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                <span class="material-icons-round" style="font-size: 14px;">call</span>
+                模擬來電
+            </button>
+            <button type="button" class="btn btn-outline" onclick="simulateScenarioMsg('{{ scenario.caller_name }}', '{{ scenario.caller_number }}', '{{ scenario.audio_file }}', '{{ scenario.avatar_path }}')" style="padding: 0.5rem; font-size: 0.85rem; flex: 1; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                <span class="material-icons-round" style="font-size: 14px;">message</span>
+                模擬訊息
+            </button>
+        </div>
+
         <form action="{{ url_for('scenario.apply_scenario', id=scenario.id) }}" method="POST"
-            style="margin-top: 1.5rem;">
+            style="margin-top: 0.5rem;">
             {% if active_scenario_id == scenario.id %}
-            <button type="button" class="btn btn-outline" disabled>已套用此劇本</button>
+            <button type="button" class="btn btn-outline" style="font-size: 0.85rem; width: 100%; border-color: var(--accent-primary); color: var(--accent-secondary);" disabled>✓ 已套用此設定</button>
             {% else %}
-            <button type="submit" class="btn btn-primary">套用此劇本</button>
+            <button type="submit" class="btn btn-outline" style="font-size: 0.85rem; width: 100%;">套用至首頁</button>
             {% endif %}
         </form>
     </div>
     {% endfor %}
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function getVoiceScript(audioFile) {
+    if (!audioFile) return 'voice_family';
+    const s = audioFile.toLowerCase();
+    if (s.includes('family') || s.includes('mom') || s.includes('dad')) return 'voice_family';
+    if (s.includes('boss') || s.includes('work') || s.includes('overtime')) return 'voice_boss';
+    if (s.includes('delivery') || s.includes('friend') || s.includes('sing') || s.includes('social')) return 'voice_friend';
+    return 'voice_family';
+}
+
+function simulateScenarioCall(name, phone, audioFile, avatarPath) {
+    const voiceFile = getVoiceScript(audioFile);
+    // 提取 avatar 檔名
+    let avatar = 'avatar_default.png';
+    if (avatarPath) {
+        avatar = avatarPath.substring(avatarPath.lastIndexOf('/') + 1);
+        if (!avatar || avatar.indexOf('.') === -1) {
+            avatar = 'avatar_default.png';
+        }
+    }
+    const targetUrl = `/call/incoming?name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}&avatar=${encodeURIComponent(avatar)}&voice_file=${encodeURIComponent(voiceFile)}&call_style=ios&back_url=${encodeURIComponent(window.location.pathname)}`;
+    window.location.href = targetUrl;
+}
+
+function simulateScenarioMsg(name, phone, audioFile, avatarPath) {
+    const voiceFile = getVoiceScript(audioFile);
+    let avatar = 'avatar_default.png';
+    if (avatarPath) {
+        avatar = avatarPath.substring(avatarPath.lastIndexOf('/') + 1);
+        if (!avatar || avatar.indexOf('.') === -1) {
+            avatar = 'avatar_default.png';
+        }
+    }
+    const targetUrl = `/call/incoming_msg?name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}&avatar=${encodeURIComponent(avatar)}&voice_file=${encodeURIComponent(voiceFile)}&call_style=ios&back_url=${encodeURIComponent(window.location.pathname)}`;
+    window.location.href = targetUrl;
+}
+</script>
 {% endblock %}

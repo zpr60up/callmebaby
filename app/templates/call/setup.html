@@ -576,6 +576,112 @@
         flex: 1;
     }
 }
+
+/* ─── Custom Modal Overlays ─── */
+.custom-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 10, 15, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: fadeInModal 0.2s ease forwards;
+}
+
+@keyframes fadeInModal {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.custom-modal-content {
+    width: 100%;
+    max-width: 400px;
+    background: rgba(20, 20, 30, 0.8) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    margin-bottom: 0 !important;
+    animation: slideUpModal 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideUpModal {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-primary);
+}
+
+.modal-title .material-icons-round {
+    color: var(--accent-secondary);
+}
+
+.modal-subtitle {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.modal-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.btn-modal {
+    flex: 1;
+    padding: 12px;
+    border-radius: var(--radius-md);
+    border: none;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: var(--font-primary);
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.btn-cancel {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+}
+
+.btn-cancel:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-primary);
+}
+
+.btn-confirm {
+    background: var(--accent-gradient);
+    color: #fff;
+}
+
+.btn-confirm:hover {
+    box-shadow: var(--shadow-glow);
+    transform: translateY(-1px);
+}
+
+.btn-danger-confirm {
+    background: var(--danger);
+    color: #fff;
+}
+
+.btn-danger-confirm:hover {
+    background: #e11d48;
+    box-shadow: 0 0 15px rgba(244, 63, 94, 0.4);
+    transform: translateY(-1px);
+}
 </style>
 {% endblock %}
 
@@ -713,8 +819,8 @@
                             <span class="material-icons-round">message</span>
                             訊息
                         </a>
-                        <form action="{{ url_for('call.delete_caller', caller_id=c['id']) }}" method="POST" style="margin:0" onsubmit="return confirm('確定要刪除「{{ c['name'] }}」嗎？')">
-                            <button type="submit" class="btn-call btn-call-danger" style="width:100%">
+                        <form action="{{ url_for('call.delete_caller', caller_id=c['id']) }}" method="POST" style="margin:0">
+                            <button type="button" onclick="confirmDelete(this, '{{ c['name'] }}')" class="btn-call btn-call-danger" style="width:100%">
                                 <span class="material-icons-round">delete</span>
                                 刪除
                             </button>
@@ -730,6 +836,88 @@
             {% endif %}
         </div>
 
+        <!-- Custom HTML Modals -->
+        <!-- Modal 1: Call Trigger Modal -->
+        <div id="call-modal" class="custom-modal-overlay" style="display: none;">
+            <div class="custom-modal-content glass-card">
+                <h3 class="modal-title">
+                    <span class="material-icons-round">call</span>
+                    模擬來電設定
+                </h3>
+                <p class="modal-subtitle">來電者：<span id="call-modal-caller-name"></span></p>
+                
+                <div class="form-group" style="margin: 20px 0;">
+                    <label class="form-label" style="display: flex; justify-content: space-between;">
+                        <span>延遲撥入時間</span>
+                        <span id="call-modal-timer-val" style="color: var(--accent-secondary); font-weight: bold;">即時</span>
+                    </label>
+                    <input type="range" id="call-modal-slider" min="0" max="120" step="5" value="0" style="width: 100%; margin-top: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-secondary); margin-top: 4px;">
+                        <span>即時</span>
+                        <span>30秒</span>
+                        <span>60秒</span>
+                        <span>120秒</span>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-modal btn-cancel" onclick="closeCallModal()">取消</button>
+                    <button type="button" class="btn-modal btn-confirm" id="call-modal-confirm-btn">確認觸發</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal 2: Message Trigger Modal -->
+        <div id="msg-modal" class="custom-modal-overlay" style="display: none;">
+            <div class="custom-modal-content glass-card">
+                <h3 class="modal-title">
+                    <span class="material-icons-round">message</span>
+                    模擬簡訊設定
+                </h3>
+                <p class="modal-subtitle">傳送者：<span id="msg-modal-caller-name"></span></p>
+
+                <div class="form-group" style="margin: 16px 0 10px;">
+                    <label class="form-label">簡訊內容</label>
+                    <textarea id="msg-modal-textarea" rows="3" class="form-input" style="width: 100%; resize: none; background: rgba(0,0,0,0.2); font-size: 14px; line-height: 1.4; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 8px; color: var(--text-primary); outline: none;"></textarea>
+                </div>
+                
+                <div class="form-group" style="margin: 16px 0;">
+                    <label class="form-label" style="display: flex; justify-content: space-between;">
+                        <span>延遲傳送時間</span>
+                        <span id="msg-modal-timer-val" style="color: var(--accent-secondary); font-weight: bold;">即時</span>
+                    </label>
+                    <input type="range" id="msg-modal-slider" min="0" max="120" step="5" value="0" style="width: 100%; margin-top: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-secondary); margin-top: 4px;">
+                        <span>即時</span>
+                        <span>30秒</span>
+                        <span>60秒</span>
+                        <span>120秒</span>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-modal btn-cancel" onclick="closeMsgModal()">取消</button>
+                    <button type="button" class="btn-modal btn-confirm" id="msg-modal-confirm-btn">確認觸發</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal 3: Delete Confirm Modal -->
+        <div id="delete-modal" class="custom-modal-overlay" style="display: none;">
+            <div class="custom-modal-content glass-card" style="max-width: 360px;">
+                <h3 class="modal-title" style="color: var(--danger);">
+                    <span class="material-icons-round" style="color: var(--danger);">delete_forever</span>
+                    確認刪除來電者？
+                </h3>
+                <p class="modal-subtitle" style="margin-bottom: 20px;">刪除「<span id="delete-modal-caller-name" style="font-weight: bold; color: var(--text-primary);"></span>」後，該來電設定將永久移除且無法還原。</p>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-modal btn-cancel" onclick="closeDeleteModal()">取消</button>
+                    <button type="button" class="btn-modal btn-danger-confirm" id="delete-modal-confirm-btn">確認刪除</button>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 {% endblock %}
@@ -738,6 +926,7 @@
 <script>
 let countdownInterval = null;
 let countdownSeconds = 0;
+let activeDeleteForm = null;
 
 function showCountdown(seconds, callback) {
     let overlay = document.getElementById('custom-countdown-overlay');
@@ -793,22 +982,44 @@ function showCountdown(seconds, callback) {
 }
 
 function triggerCall(callerId, callerName, callStyle) {
-    const delayStr = prompt(`【模擬來電設定】\n來電者：${callerName}\n\n請輸入延遲秒數 (輸入 0 代表即時來電，或輸入 10, 30, 60 等秒數):`, "0");
-    if (delayStr === null) return;
-    
-    const delay = parseInt(delayStr) || 0;
-    const targetUrl = `/call/incoming/${callerId}`;
-    
-    if (delay > 0) {
-        showCountdown(delay, () => {
+    document.getElementById('call-modal-caller-name').textContent = callerName;
+    const slider = document.getElementById('call-modal-slider');
+    const timerVal = document.getElementById('call-modal-timer-val');
+    slider.value = 0;
+    timerVal.textContent = '即時';
+
+    slider.oninput = (e) => {
+        const val = parseInt(e.target.value);
+        if (val === 0) {
+            timerVal.textContent = '即時';
+        } else {
+            timerVal.textContent = `${val} 秒`;
+        }
+    };
+
+    document.getElementById('call-modal-confirm-btn').onclick = () => {
+        const delay = parseInt(slider.value);
+        const targetUrl = `/call/incoming/${callerId}?back_url=${encodeURIComponent(window.location.pathname)}`;
+        
+        closeCallModal();
+        if (delay > 0) {
+            showCountdown(delay, () => {
+                window.location.href = targetUrl;
+            });
+        } else {
             window.location.href = targetUrl;
-        });
-    } else {
-        window.location.href = targetUrl;
-    }
+        }
+    };
+
+    document.getElementById('call-modal').style.display = 'flex';
+}
+
+function closeCallModal() {
+    document.getElementById('call-modal').style.display = 'none';
 }
 
 function triggerMessage(callerId, callerName, callStyle, voiceFile) {
+    document.getElementById('msg-modal-caller-name').textContent = callerName;
     const defaultMsgs = {
         'voice_family': '爸：你怎麼還沒回家？快點回來，媽媽在找你！',
         'voice_boss': '老闆：今晚的專案報告有問題，你現在能回公司一趟嗎？',
@@ -816,22 +1027,61 @@ function triggerMessage(callerId, callerName, callStyle, voiceFile) {
     };
     const defaultMsg = defaultMsgs[voiceFile] || '你在哪？快回來！';
     
-    const customMsg = prompt(`【模擬訊息設定】\n傳送者：${callerName}\n\n請輸入欲顯示的簡訊內容:`, defaultMsg);
-    if (customMsg === null) return;
-    
-    const delayStr = prompt(`【模擬訊息設定】\n\n請輸入延遲秒數 (輸入 0 代表即時訊息，或輸入 10, 30, 60 等秒數):`, "0");
-    if (delayStr === null) return;
-    
-    const delay = parseInt(delayStr) || 0;
-    const targetUrl = `/call/incoming_msg/${callerId}?message=${encodeURIComponent(customMsg)}`;
-    
-    if (delay > 0) {
-        showCountdown(delay, () => {
+    const textarea = document.getElementById('msg-modal-textarea');
+    textarea.value = defaultMsg;
+
+    const slider = document.getElementById('msg-modal-slider');
+    const timerVal = document.getElementById('msg-modal-timer-val');
+    slider.value = 0;
+    timerVal.textContent = '即時';
+
+    slider.oninput = (e) => {
+        const val = parseInt(e.target.value);
+        if (val === 0) {
+            timerVal.textContent = '即時';
+        } else {
+            timerVal.textContent = `${val} 秒`;
+        }
+    };
+
+    document.getElementById('msg-modal-confirm-btn').onclick = () => {
+        const delay = parseInt(slider.value);
+        const msgText = textarea.value.trim();
+        const targetUrl = `/call/incoming_msg/${callerId}?message=${encodeURIComponent(msgText)}&back_url=${encodeURIComponent(window.location.pathname)}`;
+        
+        closeMsgModal();
+        if (delay > 0) {
+            showCountdown(delay, () => {
+                window.location.href = targetUrl;
+            });
+        } else {
             window.location.href = targetUrl;
-        });
-    } else {
-        window.location.href = targetUrl;
-    }
+        }
+    };
+
+    document.getElementById('msg-modal').style.display = 'flex';
+}
+
+function closeMsgModal() {
+    document.getElementById('msg-modal').style.display = 'none';
+}
+
+function confirmDelete(button, callerName) {
+    activeDeleteForm = button.closest('form');
+    document.getElementById('delete-modal-caller-name').textContent = callerName;
+    
+    document.getElementById('delete-modal-confirm-btn').onclick = () => {
+        if (activeDeleteForm) {
+            activeDeleteForm.submit();
+        }
+        closeDeleteModal();
+    };
+    
+    document.getElementById('delete-modal').style.display = 'flex';
+}
+
+function closeDeleteModal() {
+    document.getElementById('delete-modal').style.display = 'none';
 }
 </script>
 {% endblock %}

@@ -12,14 +12,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 
     <!-- Material Icons -->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet font-display-swap">
 
     <!-- Base CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
 
     {% block extra_css %}{% endblock %}
 </head>
-<body>
+<body class="{% if hide_nav %}hide-nav-present{% endif %}">
     <!-- Flash Messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -36,7 +36,28 @@
         {% endif %}
     {% endwith %}
 
-    {% block body %}{% endblock %}
+    <!-- Main Content Container -->
+    {% block body %}
+        {% block content %}{% endblock %}
+    {% endblock %}
+
+    <!-- Bottom Glassmorphic Navigation Bar -->
+    {% if not hide_nav %}
+    <nav class="app-nav">
+        <a href="/" class="nav-item {% if request.path == '/' %}active{% endif %}">
+            <span class="material-icons-round">dashboard</span>
+            <span>首頁觸發</span>
+        </a>
+        <a href="{{ url_for('call.setup') }}" class="nav-item {% if request.path.startswith('/call/setup') or request.path.startswith('/call/callers') %}active{% endif %}">
+            <span class="material-icons-round">settings_phone</span>
+            <span>來電設定</span>
+        </a>
+        <a href="{{ url_for('scenario.index') }}" class="nav-item {% if request.path.startswith('/scenarios') %}active{% endif %}">
+            <span class="material-icons-round">movie</span>
+            <span>脫逃劇本</span>
+        </a>
+    </nav>
+    {% endif %}
 
     {% block extra_js %}{% endblock %}
 

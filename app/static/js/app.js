@@ -137,8 +137,39 @@ function cancelTrigger() {
 }
 
 function executeCall() {
-    const queryParams = new URLSearchParams(currentConfig).toString();
-    window.location.href = `/call?${queryParams}`;
+    let avatar = 'avatar_default.png';
+    if (currentConfig.avatar_path) {
+        avatar = currentConfig.avatar_path.substring(currentConfig.avatar_path.lastIndexOf('/') + 1);
+        if (!avatar || avatar.indexOf('.') === -1) {
+            avatar = 'avatar_default.png';
+        }
+    }
+    
+    // Resolve voice file
+    let voiceFile = 'voice_family';
+    if (currentConfig.audio_path) {
+        const s = currentConfig.audio_path.toLowerCase();
+        if (s.includes('family') || s.includes('mom') || s.includes('dad')) voiceFile = 'voice_family';
+        else if (s.includes('boss') || s.includes('work') || s.includes('overtime')) voiceFile = 'voice_boss';
+        else if (s.includes('delivery') || s.includes('friend') || s.includes('sing') || s.includes('social')) voiceFile = 'voice_friend';
+    } else {
+        // Fallback checks on caller name to make it look smart
+        const n = currentConfig.caller_name || '';
+        if (n.includes('爸') || n.includes('媽') || n.includes('母') || n.includes('家')) voiceFile = 'voice_family';
+        else if (n.includes('老闆') || n.includes('主管') || n.includes('經理') || n.includes('公')) voiceFile = 'voice_boss';
+        else if (n.includes('友') || n.includes('歌') || n.includes('快遞')) voiceFile = 'voice_friend';
+    }
+
+    const params = new URLSearchParams({
+        name: currentConfig.caller_name || '未知',
+        phone: currentConfig.caller_phone || '0900-000-000',
+        avatar: avatar,
+        voice_file: voiceFile,
+        call_style: 'ios',
+        back_url: window.location.pathname
+    });
+
+    window.location.href = `/call/incoming?${params.toString()}`;
 }
 
 // Call Screen Logic

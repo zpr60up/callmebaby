@@ -9,14 +9,57 @@ def get_db_connection():
     return conn
 
 class Scenario:
-    def __init__(self, id, name, caller_name, caller_number, audio_file, is_custom, created_at):
+    def __init__(self, id, name, caller_name, caller_number, avatar_path, audio_file, description, category, is_custom, created_at):
         self.id = id
         self.name = name
         self.caller_name = caller_name
         self.caller_number = caller_number
+        self.avatar_path = avatar_path
         self.audio_file = audio_file
+        self.description = description
+        self.category = category
         self.is_custom = is_custom
         self.created_at = created_at
+
+    def __getitem__(self, key):
+        mapping = {
+            'id': self.id,
+            'name': self.name,
+            'title': self.name,
+            'caller_name': self.caller_name,
+            'caller_number': self.caller_number,
+            'caller_phone': self.caller_number,
+            'phone_number': self.caller_number,
+            'avatar_path': self.avatar_path,
+            'audio_file': self.audio_file,
+            'audio_path': self.audio_file,
+            'voice_path': self.audio_file,
+            'description': self.description,
+            'category': self.category,
+            'is_custom': self.is_custom,
+            'created_at': self.created_at
+        }
+        return mapping.get(key)
+
+    @property
+    def title(self):
+        return self.name
+
+    @property
+    def caller_phone(self):
+        return self.caller_number
+
+    @property
+    def phone_number(self):
+        return self.caller_number
+
+    @property
+    def audio_path(self):
+        return self.audio_file
+
+    @property
+    def voice_path(self):
+        return self.audio_file
 
     @staticmethod
     def _row_to_obj(row):
@@ -27,7 +70,10 @@ class Scenario:
             name=row['name'],
             caller_name=row['caller_name'],
             caller_number=row['caller_number'],
+            avatar_path=row['avatar_path'],
             audio_file=row['audio_file'],
+            description=row['description'],
+            category=row['category'],
             is_custom=row['is_custom'],
             created_at=row['created_at']
         )
@@ -35,7 +81,7 @@ class Scenario:
     @classmethod
     def get_all(cls):
         conn = get_db_connection()
-        scenarios = conn.execute('SELECT * FROM scenarios').fetchall()
+        scenarios = conn.execute('SELECT * FROM scenarios ORDER BY created_at DESC').fetchall()
         conn.close()
         return [cls._row_to_obj(row) for row in scenarios]
 
@@ -47,12 +93,12 @@ class Scenario:
         return cls._row_to_obj(row)
 
     @classmethod
-    def create(cls, name, caller_name, caller_number, audio_file, is_custom=True):
+    def create(cls, name, caller_name, caller_number, audio_file='', description='', category='default', is_custom=True):
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute(
-            'INSERT INTO scenarios (name, caller_name, caller_number, audio_file, is_custom) VALUES (?, ?, ?, ?, ?)',
-            (name, caller_name, caller_number, audio_file, is_custom)
+            'INSERT INTO scenarios (name, caller_name, caller_number, audio_file, description, category, is_custom) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            (name, caller_name, caller_number, audio_file, description, category, is_custom)
         )
         conn.commit()
         scenario_id = cursor.lastrowid
@@ -65,4 +111,3 @@ class Scenario:
         conn.execute('DELETE FROM scenarios WHERE id = ?', (scenario_id,))
         conn.commit()
         conn.close()
-

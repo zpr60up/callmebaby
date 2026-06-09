@@ -1,11 +1,14 @@
 {% extends "base.html" %}
+{% set hide_nav = True %}
 {% block title %}來電中 — {{ caller['name'] }}{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/call-android.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/call-common.css') }}">
 {% endblock %}
 
 {% block body %}
+<!-- 1. 來電中畫面 (Android 風格) -->
 <div class="android-call-screen" id="android-call-screen">
     <!-- 背景 -->
     <div class="android-bg"></div>
@@ -69,20 +72,132 @@
     </div>
 </div>
 
+<!-- 2. 通話中畫面 (Android 樣式與 iOS 共享面板) -->
+<div class="call-active-screen" id="call-active-screen" style="display: none;">
+    <!-- 背景 -->
+    <div class="call-bg"></div>
+
+    <!-- 狀態列 -->
+    <div class="call-status-bar">
+        <div class="call-status-time" id="call-status-time2">17:45</div>
+        <div class="call-status-right">
+            <svg width="17" height="12" viewBox="0 0 17 12"><rect x="0" y="8" width="3" height="4" rx="0.5" fill="white"/><rect x="4.5" y="5" width="3" height="7" rx="0.5" fill="white"/><rect x="9" y="2" width="3" height="10" rx="0.5" fill="white"/><rect x="13.5" y="0" width="3" height="12" rx="0.5" fill="white"/></svg>
+            <svg width="27" height="13" viewBox="0 0 27 13" fill="none"><rect x="0.5" y="0.5" width="23" height="12" rx="2.5" stroke="white" stroke-opacity="0.5"/><rect x="2" y="2" width="18" height="9" rx="1.5" fill="white"/><path d="M25 4.5v4a2 2 0 000-4z" fill="white" fill-opacity="0.5"/></svg>
+        </div>
+    </div>
+
+    <!-- 通話資訊 -->
+    <div class="call-info-section">
+        <div class="call-active-avatar">
+            <img src="{{ url_for('static', filename='images/' + caller['avatar']) }}"
+                 alt="{{ caller['name'] }}"
+                 onerror="this.src='{{ url_for('static', filename='images/avatar_default.png') }}'">
+        </div>
+        <div class="call-active-name">{{ caller['name'] }}</div>
+        <div class="call-active-timer" id="call-timer">00:00</div>
+    </div>
+
+    <!-- 控制按鈕網格 -->
+    <div class="call-controls-grid">
+        <button class="call-ctrl-btn" id="btn-mute" onclick="toggleMute()">
+            <div class="call-ctrl-icon" id="icon-mute">
+                <span class="material-icons-round">mic</span>
+            </div>
+            <span class="call-ctrl-label" id="label-mute">靜音</span>
+        </button>
+        <button class="call-ctrl-btn" id="btn-keypad" onclick="toggleKeypad()">
+            <div class="call-ctrl-icon">
+                <span class="material-icons-round">dialpad</span>
+            </div>
+            <span class="call-ctrl-label">鍵盤</span>
+        </button>
+        <button class="call-ctrl-btn" id="btn-speaker" onclick="toggleSpeaker()">
+            <div class="call-ctrl-icon" id="icon-speaker">
+                <span class="material-icons-round">volume_up</span>
+            </div>
+            <span class="call-ctrl-label" id="label-speaker">擴音</span>
+        </button>
+        <button class="call-ctrl-btn" id="btn-add-call">
+            <div class="call-ctrl-icon">
+                <span class="material-icons-round">person_add</span>
+            </div>
+            <span class="call-ctrl-label">新增通話</span>
+        </button>
+        <button class="call-ctrl-btn" id="btn-facetime">
+            <div class="call-ctrl-icon">
+                <span class="material-icons-round">videocam</span>
+            </div>
+            <span class="call-ctrl-label">視訊</span>
+        </button>
+        <button class="call-ctrl-btn" id="btn-contacts">
+            <div class="call-ctrl-icon">
+                <span class="material-icons-round">contacts</span>
+            </div>
+            <span class="call-ctrl-label">聯絡人</span>
+        </button>
+    </div>
+
+    <!-- 掛斷按鈕 -->
+    <div class="call-end-section">
+        <button class="call-end-btn" id="btn-end-call" onclick="endActiveCall()">
+            <span class="material-icons-round">call_end</span>
+        </button>
+    </div>
+
+    <!-- 底部導航列 -->
+    <div class="android-nav-bar">
+        <div class="android-nav-pill"></div>
+    </div>
+
+    <!-- 數字鍵盤 overlay -->
+    <div class="keypad-overlay" id="keypad-overlay" style="display:none;">
+        <div class="keypad-header">
+            <span class="keypad-number" id="keypad-display"></span>
+            <button class="keypad-close" onclick="toggleKeypad()">
+                <span class="material-icons-round">keyboard_hide</span>
+            </button>
+        </div>
+        <div class="keypad-grid">
+            <button class="keypad-key" onclick="pressKey('1')"><span class="key-num">1</span><span class="key-sub"></span></button>
+            <button class="keypad-key" onclick="pressKey('2')"><span class="key-num">2</span><span class="key-sub">ABC</span></button>
+            <button class="keypad-key" onclick="pressKey('3')"><span class="key-num">3</span><span class="key-sub">DEF</span></button>
+            <button class="keypad-key" onclick="pressKey('4')"><span class="key-num">4</span><span class="key-sub">GHI</span></button>
+            <button class="keypad-key" onclick="pressKey('5')"><span class="key-num">5</span><span class="key-sub">JKL</span></button>
+            <button class="keypad-key" onclick="pressKey('6')"><span class="key-num">6</span><span class="key-sub">MNO</span></button>
+            <button class="keypad-key" onclick="pressKey('7')"><span class="key-num">7</span><span class="key-sub">PQRS</span></button>
+            <button class="keypad-key" onclick="pressKey('8')"><span class="key-num">8</span><span class="key-sub">TUV</span></button>
+            <button class="keypad-key" onclick="pressKey('9')"><span class="key-num">9</span><span class="key-sub">WXYZ</span></button>
+            <button class="keypad-key" onclick="pressKey('*')"><span class="key-num">＊</span><span class="key-sub"></span></button>
+            <button class="keypad-key" onclick="pressKey('0')"><span class="key-num">0</span><span class="key-sub">+</span></button>
+            <button class="keypad-key" onclick="pressKey('#')"><span class="key-num">＃</span><span class="key-sub"></span></button>
+        </div>
+    </div>
+</div>
+
 <!-- 隱藏資料 -->
 <input type="hidden" id="caller-id" value="{{ caller['id'] }}">
 <input type="hidden" id="caller-name" value="{{ caller['name'] }}">
 <input type="hidden" id="caller-voice" value="{{ caller['voice_file'] }}">
-<input type="hidden" id="active-call-url" value="{{ url_for('call.active_call', caller_id=caller['id']) }}">
-<input type="hidden" id="setup-url" value="{{ url_for('call.setup') }}">
+<input type="hidden" id="setup-url" value="{{ back_url }}">
 {% endblock %}
 
 {% block extra_js %}
 <script src="{{ url_for('static', filename='js/call-audio.js') }}"></script>
 <script src="{{ url_for('static', filename='js/call-incoming.js') }}"></script>
+<script src="{{ url_for('static', filename='js/call-timer.js') }}"></script>
 <script>
+    // 啟動來電
     document.addEventListener('DOMContentLoaded', () => {
         startIncomingCall('android');
+
+        // 當使用者點擊頁面任何地方時，嘗試恢復 AudioContext（解決 autoplay 被瀏覽器阻擋的問題）
+        document.addEventListener('click', () => {
+            if (audioManager.audioCtx && audioManager.audioCtx.state === 'suspended') {
+                audioManager.audioCtx.resume().then(() => {
+                    console.log('[Audio] AudioContext resumed successfully');
+                });
+            }
+        }, { once: true });
     });
 </script>
 {% endblock %}

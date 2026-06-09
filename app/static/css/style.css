@@ -50,7 +50,7 @@ body {
 /* Dashboard UI */
 .dashboard {
     padding: 20px;
-    padding-bottom: 250px; /* Space for trigger section */
+    padding-bottom: 330px; /* Space for trigger section + nav bar */
 }
 
 .header {
@@ -211,7 +211,7 @@ body {
     transform: translateX(-50%);
     width: 100%;
     max-width: 480px;
-    padding: 20px;
+    padding: 20px 20px 96px; /* Added 96px bottom padding to clear nav bar */
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
     z-index: 10;

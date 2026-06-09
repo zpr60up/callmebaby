@@ -1,5 +1,11 @@
 {% extends 'base.html' %}
 
+{% set hide_nav = True %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+{% endblock %}
+
 {% block content %}
 <div class="call-screen">
     <!-- Incoming Call State -->
@@ -73,4 +79,8 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
 {% endblock %}

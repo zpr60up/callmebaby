@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for
 from app.models.scenario import Scenario
 from app.models.custom_caller import CustomCaller
+from app.models import caller as caller_model
 
 bp = Blueprint('main', __name__)
 
@@ -8,12 +9,16 @@ bp = Blueprint('main', __name__)
 def index():
     scenarios = Scenario.get_all()
     custom_callers = CustomCaller.get_all()
-    return render_template('index.html', scenarios=scenarios, custom_callers=custom_callers)
+    saved_callers = caller_model.get_all()
+    return render_template('index.html', 
+                           scenarios=scenarios, 
+                           custom_callers=custom_callers, 
+                           saved_callers=saved_callers)
 
 @bp.route('/api/scenarios')
 def api_scenarios():
     scenarios = Scenario.get_all()
-    return jsonify(scenarios)
+    return jsonify([dict(id=s.id, title=s.title, caller_name=s.caller_name, caller_phone=s.caller_phone, avatar_path=s.avatar_path, category=s.category, description=s.description) for s in scenarios])
 
 @bp.route('/call')
 def call():

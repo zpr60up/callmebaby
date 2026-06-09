@@ -1,5 +1,9 @@
 {% extends 'base.html' %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+{% endblock %}
+
 {% block content %}
 <div class="dashboard">
     <header class="header">
@@ -49,6 +53,11 @@
             <div class="form-group">
                 <label>儲存的來電者</label>
                 <div class="saved-callers">
+                    {% for c in saved_callers %}
+                    <div class="caller-chip" onclick="fillCustom('{{ c.name }}', '{{ c.phone }}')">
+                        {{ c.name }}
+                    </div>
+                    {% endfor %}
                     {% for c in custom_callers %}
                     <div class="caller-chip" onclick="fillCustom('{{ c.caller_name }}', '{{ c.caller_phone }}')">
                         {{ c.caller_name }}
@@ -95,4 +104,8 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
 {% endblock %}

@@ -62,6 +62,11 @@ html, body {
     overflow-x: hidden;
 }
 
+/* 確保底部的選單不會遮住主畫面內容 */
+body:not(.hide-nav-present) {
+    padding-bottom: 96px !important;
+}
+
 /* ─── Flash Messages ─── */
 .flash-container {
     position: fixed;
@@ -125,4 +130,60 @@ html, body {
 ::selection {
     background: rgba(108, 92, 231, 0.4);
     color: #fff;
+}
+
+/* ─── Bottom Glassmorphic Navigation Bar ─── */
+.app-nav {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 40px);
+    max-width: 440px;
+    background: rgba(18, 18, 26, 0.65);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 14px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 
+                0 1px 0 rgba(255, 255, 255, 0.1) inset;
+    z-index: 999;
+    transition: all 0.3s ease;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    flex: 1;
+    padding: 6px 0;
+    border-radius: 16px;
+}
+
+.nav-item:hover {
+    color: var(--text-primary);
+}
+
+.nav-item.active {
+    color: var(--accent-secondary);
+    background: rgba(108, 92, 231, 0.12);
+}
+
+.nav-item .material-icons-round {
+    font-size: 22px;
+    transition: transform 0.2s ease;
+}
+
+.nav-item.active .material-icons-round {
+    transform: translateY(-2px);
+    color: var(--accent-secondary);
 }

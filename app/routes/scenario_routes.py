@@ -13,13 +13,13 @@ def index():
 def apply_scenario(id):
     scenario = Scenario.get_by_id(id)
     if scenario:
-        session['active_scenario_id'] = scenario['id']
+        session['active_scenario_id'] = scenario.id
         session['active_scenario'] = {
-            'caller_name': scenario['caller_name'],
-            'phone_number': scenario['phone_number'],
-            'voice_path': scenario['voice_path']
+            'caller_name': scenario.caller_name,
+            'phone_number': scenario.caller_number,
+            'voice_path': scenario.audio_file
         }
-        flash(f"已成功套用【{scenario['title']}】劇本", "success")
+        flash(f"已成功套用【{scenario.title}】劇本", "success")
     else:
         flash("找不到該劇本", "error")
         
@@ -37,7 +37,7 @@ def new_scenario():
             flash('劇本名稱、來電者名稱與電話號碼為必填', 'error')
             return render_template('scenario/new.html', title=title, caller_name=caller_name, phone_number=phone_number, description=description)
             
-        Scenario.create(title, caller_name, phone_number, description)
+        Scenario.create(title, caller_name, phone_number, description=description)
         flash('成功新增自定義劇本！', 'success')
         return redirect(url_for('scenario.index'))
         

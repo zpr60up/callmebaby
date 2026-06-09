@@ -33,21 +33,23 @@ function acceptCall() {
     // 停止鈴聲
     audioManager.stopRinging();
 
-    // 移除振鈴動畫
+    // 移除振鈴動畫並隱藏來電畫面
     const screenId = currentStyle === 'ios' ? 'ios-call-screen' : 'android-call-screen';
     const screen = document.getElementById(screenId);
     if (screen) {
-        screen.classList.remove('ringing');
-        screen.classList.add('fading-out');
+        screen.style.display = 'none';
     }
 
-    // 轉場到通話中
-    const activeUrl = document.getElementById('active-call-url');
-    setTimeout(() => {
-        if (activeUrl) {
-            window.location.href = activeUrl.value;
-        }
-    }, 400);
+    // 顯示通話中畫面
+    const activeScreen = document.getElementById('call-active-screen');
+    if (activeScreen) {
+        activeScreen.style.display = 'flex';
+    }
+
+    // 啟動通話中計時與語音播放
+    if (typeof startActiveCall === 'function') {
+        startActiveCall();
+    }
 }
 
 /**
