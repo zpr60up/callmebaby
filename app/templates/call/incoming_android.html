@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}來電中 — {{ caller['name'] }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/call-android.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="android-call-screen" id="android-call-screen">
+    <!-- 背景 -->
+    <div class="android-bg"></div>
+
+    <!-- 狀態列 -->
+    <div class="android-status-bar">
+        <div class="android-time" id="android-status-time">17:45</div>
+        <div class="android-status-right">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+        </div>
+    </div>
+
+    <!-- 來電標籤 -->
+    <div class="android-call-label">
+        <span class="android-call-label-text">來電</span>
+    </div>
+
+    <!-- 來電者資訊 -->
+    <div class="android-caller-section">
+        <div class="android-caller-avatar" id="android-caller-avatar">
+            <img src="{{ url_for('static', filename='images/' + caller['avatar']) }}"
+                 alt="{{ caller['name'] }}"
+                 onerror="this.src='{{ url_for('static', filename='images/avatar_default.png') }}'">
+            <div class="android-avatar-ripple"></div>
+            <div class="android-avatar-ripple android-ripple-2"></div>
+            <div class="android-avatar-ripple android-ripple-3"></div>
+        </div>
+        <div class="android-caller-name">{{ caller['name'] }}</div>
+        <div class="android-caller-number">{{ caller['phone'] }}</div>
+        <div class="android-caller-type">行動電話</div>
+    </div>
+
+    <!-- 中間快捷按鈕 -->
+    <div class="android-mid-actions">
+        <button class="android-mid-btn" id="btn-android-msg">
+            <span class="material-icons-round">chat</span>
+            <span>回覆訊息</span>
+        </button>
+    </div>
+
+    <!-- 底部接聽/拒絕 -->
+    <div class="android-bottom-actions">
+        <div class="android-action-group">
+            <button class="android-action-btn android-decline-btn" id="btn-android-decline" onclick="declineCall()">
+                <span class="material-icons-round">call_end</span>
+            </button>
+            <span class="android-action-label">拒絕</span>
+        </div>
+        <div class="android-action-group">
+            <button class="android-action-btn android-accept-btn" id="btn-android-accept" onclick="acceptCall()">
+                <span class="material-icons-round">call</span>
+            </button>
+            <span class="android-action-label">接聽</span>
+        </div>
+    </div>
+
+    <!-- 底部導航列 -->
+    <div class="android-nav-bar">
+        <div class="android-nav-pill"></div>
+    </div>
+</div>
+
+<!-- 隱藏資料 -->
+<input type="hidden" id="caller-id" value="{{ caller['id'] }}">
+<input type="hidden" id="caller-name" value="{{ caller['name'] }}">
+<input type="hidden" id="caller-voice" value="{{ caller['voice_file'] }}">
+<input type="hidden" id="active-call-url" value="{{ url_for('call.active_call', caller_id=caller['id']) }}">
+<input type="hidden" id="setup-url" value="{{ url_for('call.setup') }}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/call-audio.js') }}"></script>
+<script src="{{ url_for('static', filename='js/call-incoming.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        startIncomingCall('android');
+    });
+</script>
+{% endblock %}

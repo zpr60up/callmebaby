@@ -32,6 +32,18 @@ CREATE TABLE IF NOT EXISTS scenarios (
     audio_file TEXT,
     is_custom INTEGER DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+INSERT INTO callers (name, phone, avatar, voice_file, call_style) VALUES
+    ('爸爸', '0912-345-678', 'avatar_dad.png', 'voice_family', 'ios'),
+    ('老闆', '02-2345-6789', 'avatar_boss.png', 'voice_boss', 'ios'),
+    ('好朋友', '0978-123-456', 'avatar_friend.png', 'voice_friend', 'ios');
+CREATE TABLE IF NOT EXISTS scenarios (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    caller_name TEXT NOT NULL,
+    caller_number TEXT NOT NULL,
+    audio_file TEXT,
+    is_custom INTEGER DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS custom_callers (

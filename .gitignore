@@ -1,12 +1,27 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual Environment
 .venv/
-__pycache__/
-instance/
-*.pyc
-*.db
-instance/
-*.pyc
-.env
-__pycache__/
-*.db
 venv/
 env/
+
+# Instance (SQLite DB)
+instance/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
