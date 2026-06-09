@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>通話中...</title>
-    <!-- 根據設定載入對應的 CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/' + os_style + '.css') }}">
+    <!-- 加入共通的 CSS 樣式 (數字鍵盤等) -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/call-common.css') }}?v=2">
+    <!-- 根據設定載入對應的作業系統 CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/' + os_style + '.css') }}?v=2">
 </head>
 <body class="{{ os_style }}-style">
     <div class="call-screen">
@@ -86,9 +88,9 @@
     <input type="hidden" id="caller-voice" value="{{ tts_voice }}">
     <input type="hidden" id="setup-url" value="{{ url_for('scenario.index') }}">
 
-    <script src="{{ url_for('static', filename='js/call-audio.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/call-incoming.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/call-timer.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/call-audio.js') }}?v=3"></script>
+    <script src="{{ url_for('static', filename='js/call-incoming.js') }}?v=3"></script>
+    <script src="{{ url_for('static', filename='js/call-timer.js') }}?v=3"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             startActiveCall();
