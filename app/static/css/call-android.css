@@ -1,0 +1,107 @@
+/* ═══════════════════════════════════════════
+   Android Material 3 — 來電畫面樣式
+   ═══════════════════════════════════════════ */
+
+.android-call-screen {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    font-family: 'Roboto', 'Google Sans', sans-serif;
+    color: #fff;
+    overflow: hidden;
+    user-select: none;
+}
+
+.android-bg {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, #1b2838 0%, #1a2332 30%, #172030 60%, #121a26 100%);
+    z-index: 0;
+}
+
+.android-status-bar {
+    position: relative; z-index: 10; width: 100%;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 20px; font-size: 14px; font-weight: 500;
+}
+
+.android-status-right { display: flex; align-items: center; gap: 8px; opacity: 0.8; }
+
+.android-call-label { position: relative; z-index: 10; width: 100%; padding: 0 24px; margin-top: 4px; }
+.android-call-label-text { font-size: 14px; color: rgba(255,255,255,0.6); }
+
+.android-caller-section {
+    position: relative; z-index: 10; display: flex; flex-direction: column;
+    align-items: center; flex: 1; justify-content: center;
+    animation: androidCallerIn 0.6s cubic-bezier(0.2,0,0,1) forwards; opacity: 0;
+}
+@keyframes androidCallerIn { from { opacity:0; transform:scale(0.9); } to { opacity:1; transform:scale(1); } }
+
+.android-caller-avatar { position: relative; width: 100px; height: 100px; margin-bottom: 20px; }
+.android-caller-avatar img { width:100%; height:100%; border-radius:50%; object-fit:cover; position:relative; z-index:3; }
+
+.android-avatar-ripple {
+    position: absolute; inset: -10px; border-radius: 50%;
+    border: 1.5px solid rgba(255,255,255,0.15);
+    animation: androidRipple 3s ease-out infinite; z-index: 1;
+}
+.android-ripple-2 { animation-delay: 1s; }
+.android-ripple-3 { animation-delay: 2s; }
+@keyframes androidRipple {
+    0% { transform:scale(1); opacity:0.6; }
+    100% { transform:scale(2.2); opacity:0; }
+}
+
+.android-caller-name { font-size:28px; font-weight:400; margin-bottom:6px; }
+.android-caller-number { font-size:16px; color:rgba(255,255,255,0.65); margin-bottom:4px; }
+.android-caller-type { font-size:13px; color:rgba(255,255,255,0.4); }
+
+.android-mid-actions {
+    position:relative; z-index:10; padding:0 24px; width:100%;
+    animation: androidMidIn 0.5s 0.3s ease forwards; opacity:0;
+}
+@keyframes androidMidIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+.android-mid-btn {
+    display:flex; align-items:center; gap:8px; width:100%; padding:14px 20px;
+    background:rgba(255,255,255,0.08); border:none; border-radius:28px;
+    color:rgba(255,255,255,0.8); font-size:14px; font-family:'Roboto',sans-serif; cursor:pointer;
+}
+.android-mid-btn:active { background:rgba(255,255,255,0.15); }
+.android-mid-btn .material-icons-round { font-size:20px; color:rgba(255,255,255,0.6); }
+
+.android-bottom-actions {
+    position:relative; z-index:10; display:flex; gap:80px; padding-bottom:50px;
+    animation: androidBottomIn 0.5s 0.4s ease forwards; opacity:0;
+}
+@keyframes androidBottomIn { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+
+.android-action-group { display:flex; flex-direction:column; align-items:center; gap:10px; }
+
+.android-action-btn {
+    width:68px; height:68px; border-radius:50%; border:none;
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+    transition: all 0.2s ease; position:relative; overflow:hidden;
+}
+.android-action-btn .material-icons-round { font-size:30px; color:#fff; position:relative; z-index:2; }
+.android-action-btn:active { transform:scale(0.93); }
+
+.android-decline-btn { background:#ea4335; box-shadow:0 4px 16px rgba(234,67,53,0.35); }
+.android-accept-btn { background:#34a853; box-shadow:0 4px 16px rgba(52,168,83,0.35); animation:androidAcceptPulse 2s ease-in-out infinite; }
+@keyframes androidAcceptPulse {
+    0%,100% { box-shadow:0 4px 16px rgba(52,168,83,0.35),0 0 0 0 rgba(52,168,83,0.25); }
+    50% { box-shadow:0 4px 16px rgba(52,168,83,0.35),0 0 0 12px rgba(52,168,83,0); }
+}
+.android-accept-btn:active { animation:none; }
+.android-action-label { font-size:13px; color:rgba(255,255,255,0.55); }
+
+.android-nav-bar { position:absolute; bottom:0; width:100%; height:28px; display:flex; align-items:center; justify-content:center; z-index:10; }
+.android-nav-pill { width:100px; height:4px; background:rgba(255,255,255,0.35); border-radius:2px; }
+
+.android-call-screen.ringing .android-accept-btn .material-icons-round { animation:androidPhoneRing 0.5s ease-in-out infinite alternate; }
+@keyframes androidPhoneRing { from{transform:rotate(-15deg)} to{transform:rotate(15deg)} }
+.android-call-screen.fading-out { animation:androidFadeOut 0.3s forwards; }
+@keyframes androidFadeOut { to{opacity:0;transform:scale(0.95)} }

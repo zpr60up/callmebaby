@@ -1,0 +1,398 @@
+/* ═══════════════════════════════════════════
+   iOS 17 — 來電畫面樣式
+   ═══════════════════════════════════════════ */
+
+.ios-call-screen {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    color: #fff;
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* ─── 背景 ─── */
+.ios-bg {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(160deg, 
+        #1a1a2e 0%, 
+        #16213e 25%, 
+        #0f3460 50%, 
+        #1a1a2e 75%,
+        #0d0d1a 100%);
+    background-size: 300% 300%;
+    animation: iosGradientShift 8s ease-in-out infinite;
+    z-index: 0;
+}
+
+@keyframes iosGradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    25% { background-position: 50% 0%; }
+    50% { background-position: 100% 50%; }
+    75% { background-position: 50% 100%; }
+}
+
+.ios-bg-overlay {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 30%, rgba(255,255,255,0.03) 0%, transparent 70%);
+    z-index: 1;
+}
+
+/* ─── 狀態列 ─── */
+.ios-status-bar {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 28px 0;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.ios-time {
+    width: 54px;
+}
+
+.ios-notch {
+    width: 126px;
+    height: 34px;
+    background: #000;
+    border-radius: 0 0 20px 20px;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.ios-status-icons {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* ─── 來電者資訊 ─── */
+.ios-caller-section {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 10vh;
+    animation: iosCallerFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    opacity: 0;
+}
+
+@keyframes iosCallerFadeIn {
+    from { opacity: 0; transform: translateY(-30px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.ios-caller-avatar {
+    position: relative;
+    width: 110px;
+    height: 110px;
+    margin-bottom: 16px;
+}
+
+.ios-caller-avatar img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    position: relative;
+    z-index: 2;
+}
+
+.ios-avatar-ring {
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    animation: iosRingPulse 2s ease-in-out infinite;
+}
+
+@keyframes iosRingPulse {
+    0%, 100% { 
+        transform: scale(1); 
+        border-color: rgba(255, 255, 255, 0.2);
+        opacity: 1;
+    }
+    50% { 
+        transform: scale(1.15); 
+        border-color: rgba(255, 255, 255, 0.05);
+        opacity: 0.5;
+    }
+}
+
+.ios-caller-name {
+    font-size: 32px;
+    font-weight: 300;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+
+.ios-caller-label {
+    font-size: 15px;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* ─── 快捷按鈕 ─── */
+.ios-quick-actions {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    gap: 40px;
+    margin-top: 24px;
+    animation: iosQuickFadeIn 0.6s 0.3s ease forwards;
+    opacity: 0;
+}
+
+@keyframes iosQuickFadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.ios-quick-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+}
+
+.ios-quick-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(20px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.ios-quick-icon .material-icons-round {
+    font-size: 24px;
+}
+
+.ios-quick-btn:active .ios-quick-icon {
+    background: rgba(255, 255, 255, 0.25);
+    transform: scale(0.92);
+}
+
+.ios-quick-label {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* ─── 底部接聽/拒絕 ─── */
+.ios-bottom-actions {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    gap: 60px;
+    padding-bottom: 40px;
+    animation: iosBottomFadeIn 0.6s 0.5s ease forwards;
+    opacity: 0;
+}
+
+@keyframes iosBottomFadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.ios-action-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.ios-action-btn {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.ios-action-btn .material-icons-round {
+    font-size: 34px;
+    color: #fff;
+    position: relative;
+    z-index: 2;
+}
+
+/* 拒絕按鈕 */
+.ios-decline-btn {
+    background: #ff3b30;
+    box-shadow: 0 4px 20px rgba(255, 59, 48, 0.4);
+}
+
+.ios-decline-btn:active {
+    transform: scale(0.92);
+    box-shadow: 0 2px 10px rgba(255, 59, 48, 0.3);
+}
+
+/* 接聽按鈕 */
+.ios-accept-btn {
+    background: #34c759;
+    box-shadow: 0 4px 20px rgba(52, 199, 89, 0.4);
+    animation: iosAcceptPulse 2s ease-in-out infinite;
+}
+
+@keyframes iosAcceptPulse {
+    0%, 100% { box-shadow: 0 4px 20px rgba(52, 199, 89, 0.4), 0 0 0 0 rgba(52, 199, 89, 0.3); }
+    50% { box-shadow: 0 4px 20px rgba(52, 199, 89, 0.4), 0 0 0 14px rgba(52, 199, 89, 0); }
+}
+
+.ios-accept-btn:active {
+    transform: scale(0.92);
+    animation: none;
+}
+
+.ios-action-label {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 400;
+}
+
+/* ─── 滑動接聽（替代模式） ─── */
+.ios-slide-hint {
+    position: relative;
+    z-index: 10;
+    width: 85%;
+    max-width: 340px;
+    padding-bottom: 50px;
+}
+
+.ios-slide-track {
+    position: relative;
+    height: 62px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 31px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    backdrop-filter: blur(20px);
+}
+
+.ios-slide-thumb {
+    position: absolute;
+    left: 4px;
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    background: #34c759;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+    z-index: 3;
+    transition: left 0.1s linear;
+    box-shadow: 0 2px 10px rgba(52, 199, 89, 0.4);
+}
+
+.ios-slide-thumb .material-icons-round {
+    font-size: 28px;
+    color: #fff;
+}
+
+.ios-slide-thumb:active {
+    cursor: grabbing;
+}
+
+.ios-slide-text {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 400;
+    letter-spacing: 1px;
+    color: rgba(255, 255, 255, 0.5);
+    z-index: 1;
+    animation: iosTextPulse 2s ease-in-out infinite;
+}
+
+@keyframes iosTextPulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 0.8; }
+}
+
+.ios-slide-arrows {
+    position: absolute;
+    right: 30px;
+    display: flex;
+    gap: 3px;
+    z-index: 1;
+}
+
+.ios-arrow {
+    width: 10px;
+    height: 10px;
+    border-right: 2px solid rgba(255,255,255,0.3);
+    border-bottom: 2px solid rgba(255,255,255,0.3);
+    transform: rotate(-45deg);
+}
+
+.ios-arrow:nth-child(1) { animation: iosArrowAnim 1.5s 0s ease-in-out infinite; }
+.ios-arrow:nth-child(2) { animation: iosArrowAnim 1.5s 0.15s ease-in-out infinite; }
+.ios-arrow:nth-child(3) { animation: iosArrowAnim 1.5s 0.3s ease-in-out infinite; }
+
+@keyframes iosArrowAnim {
+    0%, 100% { opacity: 0.2; }
+    50% { opacity: 0.7; }
+}
+
+/* ─── Home Indicator ─── */
+.ios-home-indicator {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 134px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+    z-index: 10;
+}
+
+/* ─── 振鈴動畫（整個畫面微微晃動） ─── */
+.ios-call-screen.ringing {
+    animation: iosScreenShake 0.3s ease-in-out infinite;
+}
+
+@keyframes iosScreenShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-1px); }
+    75% { transform: translateX(1px); }
+}
+
+/* ─── 轉場效果 ─── */
+.ios-call-screen.fading-out {
+    animation: iosFadeOut 0.4s ease forwards;
+}
+
+@keyframes iosFadeOut {
+    to { opacity: 0; transform: scale(1.05); }
+}
