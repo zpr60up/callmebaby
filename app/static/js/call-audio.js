@@ -26,10 +26,16 @@ class CallAudioManager {
                 { text: '好，那你儘快，先這樣。', delay: 14000 }
             ],
             voice_friend: [
-                { text: '欸！你在幹嘛？出來玩啦！', delay: 1000 },
-                { text: '我們在那個老地方等你，快來！', delay: 5000 },
+                { text: '欸，你在幹嘛？出來玩啊？', delay: 1000 },
+                { text: '我們都在老地方，你趕快來啦！', delay: 5000 },
                 { text: '大家都到了就差你一個，快點啦！', delay: 9000 },
-                { text: '好啦好啦，你快來就對了，掰！', delay: 13000 }
+                { text: '好啦好啦，趕快來就是了，掰掰！', delay: 13000 }
+            ],
+            voice_delivery: [
+                { text: '喂您好，有您的包裹，請問現在方便收件嗎？', delay: 1000 },
+                { text: '我現在在大門口這裡，幫我下來拿一下喔。', delay: 5000 },
+                { text: '好的，那我放在管理室，再麻煩您去拿。', delay: 9000 },
+                { text: '好，謝謝，再見。', delay: 13000 }
             ]
         };
     }
@@ -133,7 +139,7 @@ class CallAudioManager {
                 utterance.lang = 'zh-TW';
                 utterance.rate = 0.95;
                 utterance.pitch = 1.0;
-                utterance.volume = this.isSpeaker ? 1.0 : 0.7;
+                utterance.volume = this.isSpeaker ? 1.0 : 0.2;
 
                 // 嘗試使用中文語音
                 const voices = speechSynthesis.getVoices();
