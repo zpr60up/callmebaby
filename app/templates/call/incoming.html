@@ -40,5 +40,68 @@
             </div>
         </div>
     </div>
+
+    <!-- 來電答鈴 (備用) -->
+    <audio id="ringtone" src="https://www.soundjay.com/phone/phone-ringing-01.mp3" loop></audio>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const ringtone = document.getElementById('ringtone');
+            
+            // Web Audio API 合成響鈴 (最穩定方案)
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            let ringInterval;
+
+            function playSyntheticRing() {
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                
+                const now = audioCtx.currentTime;
+                const osc1 = audioCtx.createOscillator();
+                const osc2 = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+
+                osc1.type = 'sine';
+                osc2.type = 'sine';
+                osc1.frequency.setValueAtTime(440, now); // 頻率 1
+                osc2.frequency.setValueAtTime(480, now); // 頻率 2
+
+                gainNode.gain.setValueAtTime(0, now);
+                gainNode.gain.linearRampToValueAtTime(0.2, now + 0.1);
+                gainNode.gain.linearRampToValueAtTime(0, now + 2.0); // 響兩秒
+
+                osc1.connect(gainNode);
+                osc2.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+
+                osc1.start(now);
+                osc2.start(now);
+                osc1.stop(now + 2);
+                osc2.stop(now + 2);
+            }
+
+            function startRinging() {
+                // 嘗試播放實體音檔
+                ringtone.play().catch(() => {
+                    console.log('Using synthetic ringtone instead.');
+                    // 如果音檔失敗，每 4 秒響一次 (響 2 秒停 2 秒)
+                    if (!ringInterval) {
+                        playSyntheticRing();
+                        ringInterval = setInterval(playSyntheticRing, 4000);
+                    }
+                });
+            }
+
+            // 進入頁面就嘗試
+            startRinging();
+
+            // 點擊畫面任何地方強制啟動 (處理瀏覽器阻擋)
+            document.body.addEventListener('click', () => {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                startRinging();
+            }, { once: true });
+        });
+    </script>
 </body>
 </html>

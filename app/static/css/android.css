@@ -129,3 +129,78 @@ body.android-style {
     font-size: 14px;
     color: #9aa0a6;
 }
+
+.android-style .grid-btn.active .icon-circle {
+    color: #8ab4f8;
+}
+
+/* Keypad Overlay */
+.android-style .keypad-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #111;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 60px;
+    z-index: 100;
+}
+
+.android-style .overlay-header {
+    height: 60px;
+    margin-bottom: 40px;
+}
+
+.android-style .keypad-display {
+    font-size: 36px;
+    color: #e8eaed;
+}
+
+.android-style .numeric-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+}
+
+.android-style .num-btn {
+    background: none;
+    border: none;
+    color: #e8eaed;
+    font-size: 32px;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.android-style .num-btn span {
+    font-size: 12px;
+    color: #9aa0a6;
+}
+
+.android-style .btn-hide-keypad {
+    margin-top: 50px;
+    background: none;
+    border: 1px solid #3c4043;
+    border-radius: 24px;
+    color: #8ab4f8;
+    padding: 10px 30px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+/* Base adjustment for grid-btn as button */
+.android-style .grid-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: inherit;
+    cursor: pointer;
+    outline: none;
+}
