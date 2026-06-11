@@ -6,9 +6,7 @@ bp = Blueprint('main', __name__)
 
 @bp.route('/')
 def index():
-    scenarios = Scenario.get_all()
-    custom_callers = CustomCaller.get_all()
-    return render_template('index.html', scenarios=scenarios, custom_callers=custom_callers)
+    return redirect(url_for('call.setup'))
 
 @bp.route('/api/scenarios')
 def api_scenarios():
