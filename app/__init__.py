@@ -63,6 +63,14 @@ def init_and_upgrade_db(instance_path):
                 conn.execute("ALTER TABLE scenarios ADD COLUMN description TEXT;")
                 conn.commit()
                 print('[Call Me Baby] Database upgraded: added description to scenarios.')
+            
+            # 3. Ensure voice_gender column exists in callers
+            cursor = conn.execute("PRAGMA table_info(callers)")
+            columns = [row[1] for row in cursor.fetchall()]
+            if 'voice_gender' not in columns:
+                conn.execute("ALTER TABLE callers ADD COLUMN voice_gender TEXT DEFAULT 'female';")
+                conn.commit()
+                print('[Call Me Baby] Database upgraded: added voice_gender to callers.')
         except Exception as e:
             print(f'[Call Me Baby] Error upgrading database: {e}')
             

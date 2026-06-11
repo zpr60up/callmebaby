@@ -30,13 +30,14 @@ def create(data):
     try:
         conn = get_db_connection()
         cursor = conn.execute(
-            '''INSERT INTO callers (name, phone, avatar, voice_file, call_style)
-               VALUES (?, ?, ?, ?, ?)''',
+            '''INSERT INTO callers (name, phone, avatar, voice_file, voice_gender, call_style)
+               VALUES (?, ?, ?, ?, ?, ?)''',
             (
                 data.get('name', '未知'),
                 data.get('phone', '0000-000-000'),
                 data.get('avatar', 'avatar_default.png'),
                 data.get('voice_file', 'voice_family'),
+                data.get('voice_gender', 'female'),
                 data.get('call_style', 'ios')
             )
         )
@@ -101,7 +102,7 @@ def update(caller_id, data):
         conn = get_db_connection()
         conn.execute(
             '''UPDATE callers
-               SET name = ?, phone = ?, avatar = ?, voice_file = ?, call_style = ?,
+               SET name = ?, phone = ?, avatar = ?, voice_file = ?, voice_gender = ?, call_style = ?,
                    updated_at = datetime('now','localtime')
                WHERE id = ?''',
             (
@@ -109,6 +110,7 @@ def update(caller_id, data):
                 data.get('phone'),
                 data.get('avatar', 'avatar_default.png'),
                 data.get('voice_file', 'voice_family'),
+                data.get('voice_gender', 'female'),
                 data.get('call_style', 'ios'),
                 caller_id
             )

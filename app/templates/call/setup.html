@@ -682,6 +682,21 @@
                     </div>
                 </div>
 
+                <!-- 語音性別 -->
+                <div class="form-group">
+                    <label class="form-label">語音性別</label>
+                    <div class="style-toggle">
+                        <div class="style-btn">
+                            <input type="radio" name="voice_gender" id="gender_male" value="male">
+                            <label for="gender_male">🧔 男聲</label>
+                        </div>
+                        <div class="style-btn">
+                            <input type="radio" name="voice_gender" id="gender_female" value="female" checked>
+                            <label for="gender_female">👩 女聲</label>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- 來電風格 -->
                 <div class="form-group">
                     <label class="form-label">來電風格</label>
@@ -721,6 +736,7 @@
                         <div class="caller-phone">{{ c['phone'] }}</div>
                         <div class="caller-meta">
                             <span class="meta-tag">{{ '🍎 iOS' if c['call_style'] == 'ios' else '🤖 Android' }}</span>
+                            <span class="meta-tag">{{ '🧔 男聲' if c['voice_gender'] == 'male' else '👩 女聲' }}</span>
                         </div>
                     </div>
                     <div class="caller-actions">

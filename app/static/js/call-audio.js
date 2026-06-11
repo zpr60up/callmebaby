@@ -140,8 +140,11 @@ class CallAudioManager {
 
     /**
      * 播放預錄語音（支援 TTS 與實體錄音檔）
+     * @param {string} voiceFile - 語音檔名或情境 key
+     * @param {string} gender - 'male' 或 'female'
      */
-    playVoice(voiceFile) {
+    playVoice(voiceFile, gender = 'female') {
+        this.currentGender = gender;
         const script = this.voiceScripts[voiceFile];
         if (!script) {
             console.log('[Audio] 播放自訂錄音檔案:', voiceFile);
@@ -172,20 +175,83 @@ class CallAudioManager {
 
                 const utterance = new SpeechSynthesisUtterance(line.text);
                 utterance.lang = 'zh-TW';
-                utterance.rate = 0.95;
-                utterance.pitch = 1.0;
                 utterance.volume = this.isSpeaker ? 1.0 : 0.7;
 
-                // 嘗試使用中文語音
-                const voices = speechSynthesis.getVoices();
-                const zhVoice = voices.find(v => v.lang.startsWith('zh'));
-                if (zhVoice) utterance.voice = zhVoice;
+                // 依照性別調整語音參數
+                if (gender === 'male') {
+                    utterance.pitch = 0.6;    // 更低音調 → 男聲
+                    utterance.rate = 0.85;    // 稍慢語速
+                } else {
+                    utterance.pitch = 1.2;    // 較高音調 → 女聲
+                    utterance.rate = 0.95;
+                }
+
+                // 嘗試根據性別選擇語音
+                const selectedVoice = this._selectVoiceByGender(gender);
+                if (selectedVoice) {
+                    utterance.voice = selectedVoice;
+                    console.log(`[Audio] 使用語音: ${selectedVoice.name} (${gender})`);
+                }
 
                 speechSynthesis.speak(utterance);
             }, line.delay);
 
             this.voiceTimeouts.push(timeout);
         });
+    }
+
+    /**
+     * 根據性別選擇最適合的 TTS 語音
+     * @param {string} gender - 'male' 或 'female'
+     * @returns {SpeechSynthesisVoice|null}
+     */
+    _selectVoiceByGender(gender) {
+        const voices = speechSynthesis.getVoices();
+        if (!voices.length) return null;
+
+        // 篩選中文語音
+        const zhVoices = voices.filter(v =>
+            v.lang.startsWith('zh') || v.lang.startsWith('cmn')
+        );
+
+        if (!zhVoices.length) return null;
+
+        // 男聲關鍵字（常見於各平台 TTS 引擎的語音名稱）
+        const maleKeywords = [
+            'male', 'man', '男', 'yunxi', 'yunyang', 'yunjian',
+            'xiaoming', 'zhiyu', 'zhiwei', 'kangkang',
+            'danny', 'david', 'mark', 'guy'
+        ];
+
+        // 女聲關鍵字
+        const femaleKeywords = [
+            'female', 'woman', '女', 'xiaoxiao', 'xiaoyi', 'xiaoni',
+            'yaoyao', 'huihui', 'zhiying', 'meijia',
+            'tracy', 'linda', 'yating', 'hanhan', 'yiting'
+        ];
+
+        const keywords = gender === 'male' ? maleKeywords : femaleKeywords;
+        const nameLower = v => v.name.toLowerCase();
+
+        // 1. 嘗試以關鍵字精確匹配
+        const matched = zhVoices.find(v =>
+            keywords.some(kw => nameLower(v).includes(kw))
+        );
+        if (matched) return matched;
+
+        // 2. 如果找不到男聲，過濾掉已知女聲再挑選
+        if (gender === 'male') {
+            const possibleMaleVoices = zhVoices.filter(v => 
+                !femaleKeywords.some(kw => nameLower(v).includes(kw))
+            );
+            if (possibleMaleVoices.length > 0) {
+                return possibleMaleVoices[0];
+            }
+        }
+
+        // 如果找不到精確匹配，回傳第一個中文語音（由 pitch 調整來補償）
+        console.log(`[Audio] 未找到 ${gender} 專屬語音，將以音調調整模擬`);
+        return zhVoices[0];
     }
 
     /**

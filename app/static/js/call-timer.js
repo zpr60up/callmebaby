@@ -20,8 +20,10 @@ function startActiveCall() {
 
     // 播放預錄語音
     const voiceFile = document.getElementById('caller-voice');
+    const voiceGender = document.getElementById('caller-voice-gender');
     if (voiceFile && voiceFile.value) {
-        audioManager.playVoice(voiceFile.value);
+        const gender = (voiceGender && voiceGender.value) ? voiceGender.value : 'female';
+        audioManager.playVoice(voiceFile.value, gender);
     }
 }
 

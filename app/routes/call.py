@@ -37,6 +37,7 @@ def create_caller():
     phone = request.form.get('phone', '').strip()
     avatar = request.form.get('avatar', 'avatar_default.png')
     voice_file = request.form.get('voice_file', 'voice_family')
+    voice_gender = request.form.get('voice_gender', 'female')
     call_style = request.form.get('call_style', 'ios')
 
     if not name or not phone:
@@ -68,6 +69,7 @@ def create_caller():
         'phone': phone,
         'avatar': avatar,
         'voice_file': voice_file,
+        'voice_gender': voice_gender,
         'call_style': call_style
     })
     flash(f'已新增來電者「{name}」！', 'success')
@@ -81,6 +83,7 @@ def update_caller(caller_id):
     phone = request.form.get('phone', '').strip()
     avatar = request.form.get('avatar', 'avatar_default.png')
     voice_file = request.form.get('voice_file', 'voice_family')
+    voice_gender = request.form.get('voice_gender', 'female')
     call_style = request.form.get('call_style', 'ios')
 
     if not name or not phone:
@@ -114,6 +117,7 @@ def update_caller(caller_id):
         'phone': phone,
         'avatar': avatar,
         'voice_file': voice_file,
+        'voice_gender': voice_gender,
         'call_style': call_style
     })
     flash(f'已更新來電者「{name}」！', 'success')
@@ -175,6 +179,7 @@ def api_get_caller(caller_id):
         'phone': c['phone'],
         'avatar': c['avatar'],
         'voice_file': c['voice_file'],
+        'voice_gender': c.get('voice_gender', 'female') if hasattr(c, 'get') else (c['voice_gender'] if 'voice_gender' in c.keys() else 'female'),
         'call_style': c['call_style']
     })
 @call_bp.route('/incoming_msg/<int:caller_id>')

@@ -109,6 +109,7 @@
 <input type="hidden" id="caller-id" value="{{ caller['id'] }}">
 <input type="hidden" id="caller-name" value="{{ caller['name'] }}">
 <input type="hidden" id="caller-voice" value="{{ caller['voice_file'] }}">
+<input type="hidden" id="caller-voice-gender" value="{{ caller['voice_gender'] if caller['voice_gender'] else 'female' }}">
 <input type="hidden" id="setup-url" value="{{ url_for('call.setup') }}">
 {% endblock %}
 
