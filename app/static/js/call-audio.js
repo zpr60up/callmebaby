@@ -37,57 +37,88 @@ class CallAudioManager {
     /**
      * 建立鈴聲（使用 Web Audio API 合成）
      */
-    createRingtone() {
+    createRingtone(style = 'ios') {
         try {
             this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            this._playRingtoneLoop();
+            this._playRingtoneLoop(style);
         } catch (e) {
             console.warn('[Audio] 無法建立 AudioContext:', e);
         }
     }
 
-    _playRingtoneLoop() {
+    _playRingtoneLoop(style = 'ios') {
         if (!this.audioCtx || this.ringtoneStopped) return;
 
         const ctx = this.audioCtx;
         const now = ctx.currentTime;
 
-        // 模擬電話鈴聲：雙音交替
-        const frequencies = [440, 480]; // 標準電話鈴聲頻率
-        const duration = 1.0;
-        const pause = 2.0;
+        if (style === 'ios') {
+            // iOS 經典馬林巴琴琶音 (Marimba Arpeggio)
+            // 快速彈奏 C5 -> E5 -> G5 -> C6 -> G5 -> E5
+            const melody = [523.25, 659.25, 783.99, 1046.50, 783.99, 659.25];
+            const noteDuration = 0.12;
+            const loopDuration = 1.5;
+            const pause = 1.0;
 
-        frequencies.forEach(freq => {
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
+            melody.forEach((freq, idx) => {
+                const noteStart = now + (idx * noteDuration);
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
 
-            osc.frequency.value = freq;
-            osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, noteStart);
+                osc.type = 'triangle'; // 三角波聽起來較像敲擊樂器
 
-            gain.gain.setValueAtTime(0, now);
-            gain.gain.linearRampToValueAtTime(0.15, now + 0.02);
-            gain.gain.setValueAtTime(0.15, now + duration - 0.02);
-            gain.gain.linearRampToValueAtTime(0, now + duration);
+                gain.gain.setValueAtTime(0, noteStart);
+                gain.gain.linearRampToValueAtTime(0.12, noteStart + 0.01);
+                gain.gain.exponentialRampToValueAtTime(0.0001, noteStart + noteDuration - 0.01);
 
-            osc.connect(gain);
-            gain.connect(ctx.destination);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
 
-            osc.start(now);
-            osc.stop(now + duration);
-        });
+                osc.start(noteStart);
+                osc.stop(noteStart + noteDuration);
+            });
 
-        // 循環播放
-        this.ringtoneTimer = setTimeout(() => {
-            this._playRingtoneLoop();
-        }, (duration + pause) * 1000);
+            this.ringtoneTimer = setTimeout(() => {
+                this._playRingtoneLoop(style);
+            }, (loopDuration + pause) * 1000);
+        } else {
+            // Android 傳統來電答鈴 (Classic Ringback Double-tone)
+            const frequencies = [440, 480];
+            const duration = 1.0;
+            const pause = 2.0;
+
+            frequencies.forEach(freq => {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+
+                osc.frequency.value = freq;
+                osc.type = 'sine';
+
+                gain.gain.setValueAtTime(0, now);
+                gain.gain.linearRampToValueAtTime(0.15, now + 0.02);
+                gain.gain.setValueAtTime(0.15, now + duration - 0.02);
+                gain.gain.linearRampToValueAtTime(0, now + duration);
+
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                osc.start(now);
+                osc.stop(now + duration);
+            });
+
+            this.ringtoneTimer = setTimeout(() => {
+                this._playRingtoneLoop(style);
+            }, (duration + pause) * 1000);
+        }
     }
 
     /**
      * 開始播放鈴聲
      */
-    startRinging() {
+    startRinging(style = 'ios') {
         this.ringtoneStopped = false;
-        this.createRingtone();
+        this.createRingtone(style);
         this.tryVibrate();
     }
 

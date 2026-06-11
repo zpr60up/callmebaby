@@ -16,7 +16,7 @@ function startIncomingCall(style) {
     setInterval(updateStatusTime, 1000);
 
     // 播放鈴聲
-    audioManager.startRinging();
+    audioManager.startRinging(style);
 
     // 添加振鈴動畫
     const screen = document.getElementById(style === 'ios' ? 'ios-call-screen' : 'android-call-screen');
