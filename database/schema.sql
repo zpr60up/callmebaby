@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS scenarios (
     name TEXT NOT NULL,
     caller_name TEXT NOT NULL,
     caller_number TEXT NOT NULL,
+    description TEXT,
     audio_file TEXT,
     is_custom INTEGER DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -50,14 +51,14 @@ CREATE TABLE IF NOT EXISTS custom_callers (
 );
 
 -- 預設插入的劇本資料
-INSERT INTO scenarios (name, caller_name, caller_number, audio_file, is_custom)
-SELECT '家庭急事', '媽媽', '0912345678', '/static/audio/family_emergency.mp3', 0
+INSERT INTO scenarios (name, caller_name, caller_number, description, audio_file, is_custom)
+SELECT '家庭急事', '媽媽', '0912345678', '假裝家裡有急事需要馬上回去', '/static/audio/family_emergency.mp3', 0
 WHERE NOT EXISTS (SELECT 1 FROM scenarios WHERE name = '家庭急事');
 
-INSERT INTO scenarios (name, caller_name, caller_number, audio_file, is_custom)
-SELECT '公司加班', '老闆', '0987654321', '/static/audio/boss_overtime.mp3', 0
+INSERT INTO scenarios (name, caller_name, caller_number, description, audio_file, is_custom)
+SELECT '公司加班', '老闆', '0987654321', '假裝公司臨時有狀況需要回公司處理', '/static/audio/boss_overtime.mp3', 0
 WHERE NOT EXISTS (SELECT 1 FROM scenarios WHERE name = '公司加班');
 
-INSERT INTO scenarios (name, caller_name, caller_number, audio_file, is_custom)
-SELECT '快遞取件', '快遞員', '0900000000', '/static/audio/delivery.mp3', 0
+INSERT INTO scenarios (name, caller_name, caller_number, description, audio_file, is_custom)
+SELECT '快遞取件', '快遞員', '0900000000', '假裝有重要包裹送到，必須親自簽收', '/static/audio/delivery.mp3', 0
 WHERE NOT EXISTS (SELECT 1 FROM scenarios WHERE name = '快遞取件');
