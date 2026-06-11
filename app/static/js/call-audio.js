@@ -52,8 +52,8 @@ class CallAudioManager {
         const ctx = this.audioCtx;
         const now = ctx.currentTime;
 
-        if (style === 'ios') {
-            // iOS 經典馬林巴琴琶音 (Marimba Arpeggio)
+        if (style === 'android') {
+            // Android 經典馬林巴琴琶音 (Marimba Arpeggio)
             // 快速彈奏 C5 -> E5 -> G5 -> C6 -> G5 -> E5
             const melody = [523.25, 659.25, 783.99, 1046.50, 783.99, 659.25];
             const noteDuration = 0.12;
@@ -83,7 +83,7 @@ class CallAudioManager {
                 this._playRingtoneLoop(style);
             }, (loopDuration + pause) * 1000);
         } else {
-            // Android 傳統來電答鈴 (Classic Ringback Double-tone)
+            // iOS 傳統來電答鈴 (Classic Ringback Double-tone)
             const frequencies = [440, 480];
             const duration = 1.0;
             const pause = 2.0;
